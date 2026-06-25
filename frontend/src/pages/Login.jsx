@@ -49,7 +49,7 @@ export default function Login() {
       {/* Left — artwork panel (desktop only) */}
       <div className="relative hidden flex-col justify-between overflow-hidden border-r border-border bg-[#f3eee4] p-10 lg:flex">
         <span className="font-display text-xl font-extrabold tracking-tight text-text-primary">Producty</span>
-        <img src="/art-working-desk.png" alt="Planning the day at a desk"
+        <img src="/art-working-desk.webp" alt="Planning the day at a desk"
           className="mx-auto w-full max-w-md rounded-2xl border border-border object-cover shadow-[0_30px_70px_-25px_rgba(27,26,23,0.35)]" />
         <p className="max-w-sm text-sm leading-relaxed text-text-muted">
           One calm place for your tasks, calendar, notes, and goals — with an AI assistant
