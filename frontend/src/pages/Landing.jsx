@@ -38,68 +38,11 @@ function CountUp({ to, suffix = "" }) {
   return <span ref={ref} className="tabular-nums">{Math.round(val)}{suffix}</span>;
 }
 
-/* ------------------------------------------------------------------ */
-/* Product mockup — light, soft-shadowed                               */
-/* ------------------------------------------------------------------ */
-
-function Row({ w, label, done }) {
+/* Matted-print frame so the cream sketches read as gallery art, not stock. */
+function Plate({ src, alt, className = "" }) {
   return (
-    <div className="flex items-center gap-2.5 border-b border-border py-2 last:border-0">
-      <span className={`grid h-4 w-4 shrink-0 place-items-center rounded-[3px] border ${done ? "border-accent bg-accent" : "border-text-muted/40"}`}>
-        {done && (
-          <svg viewBox="0 0 24 24" className="h-3 w-3 text-text-onaccent" fill="none" stroke="currentColor" strokeWidth={3.5}>
-            <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        )}
-      </span>
-      <span className={`text-[11px] ${done ? "text-text-muted line-through" : "text-text-primary"}`}>{label}</span>
-      <span className="ml-auto h-1.5 rounded-full bg-text-muted/15" style={{ width: w }} />
-    </div>
-  );
-}
-
-function ProductMock() {
-  return (
-    <div className="w-full overflow-hidden rounded-2xl border border-border bg-bg-surface shadow-[0_30px_80px_-20px_rgba(27,26,23,0.25)]">
-      <div className="flex items-center gap-1.5 border-b border-border bg-bg-base px-4 py-3">
-        <span className="h-2.5 w-2.5 rounded-full bg-accent-red/70" />
-        <span className="h-2.5 w-2.5 rounded-full bg-accent/70" />
-        <span className="h-2.5 w-2.5 rounded-full bg-text-muted/30" />
-        <span className="ml-3 font-display text-xs font-extrabold text-text-primary">Producty</span>
-        <span className="ml-auto h-6 w-6 rounded-full bg-accent/15" />
-      </div>
-      <div className="grid grid-cols-[1.15fr_1fr] gap-4 p-5">
-        <div className="space-y-3">
-          <div>
-            <p className="font-display text-sm font-extrabold text-text-primary">Good morning, Alex</p>
-            <p className="text-[10px] text-text-muted">Thursday — 4 tasks due</p>
-          </div>
-          <div className="rounded-xl border border-border bg-bg-base px-3 py-1">
-            <Row w="34px" label="Ship landing page" done />
-            <Row w="48px" label="Reply to professor" />
-            <Row w="28px" label="Gym at 6pm" />
-            <Row w="40px" label="Draft report" />
-          </div>
-        </div>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between rounded-xl border border-border bg-bg-base p-3">
-            <div>
-              <p className="text-[9px] uppercase tracking-wider text-text-muted">Focus</p>
-              <p className="font-display text-xl font-extrabold text-accent">72%</p>
-            </div>
-            <div className="relative h-11 w-11">
-              <div className="absolute inset-0 rounded-full border-4 border-border" />
-              <div className="absolute inset-0 rounded-full border-4 border-accent border-r-transparent border-b-transparent" />
-            </div>
-          </div>
-          <div className="rounded-xl border border-border bg-bg-base p-3">
-            <p className="text-[9px] uppercase tracking-wider text-accent">AI Assistant</p>
-            <p className="mt-1 text-[10px] leading-relaxed text-text-muted">
-              Tight afternoon. Start with the report — it's the only hard deadline today.
-            </p>
-          </div>
-        </div>
-      </div>
+    <div className={`overflow-hidden rounded-2xl border border-border bg-[#f3eee4] p-1.5 shadow-[0_30px_70px_-25px_rgba(27,26,23,0.3)] ${className}`}>
+      <img src={src} alt={alt} loading="lazy" className="w-full rounded-xl object-cover" />
     </div>
   );
 }
@@ -108,18 +51,36 @@ function ProductMock() {
 /* Content                                                             */
 /* ------------------------------------------------------------------ */
 
-const STEPS = [
-  { n: "01", title: "Capture", body: "Paste an email, a screenshot, or a brain-dump. The AI pulls out every task and deadline and files it where it belongs." },
-  { n: "02", title: "Plan", body: "Tasks, meetings, and deadlines flow into one calm view, ranked by what actually matters today." },
-  { n: "03", title: "Act", body: "Ask the AI to draft an email, break down a project, or rescue you with a 48-hour survival plan." },
+const STORY = [
+  {
+    tag: "Capture & Plan",
+    title: "Paste the chaos. Get a plan.",
+    body: "Drop an email, a screenshot, or a brain-dump. Producty's AI pulls out every task and deadline, then lays your day out from morning to evening — ranked by what actually matters.",
+    img: "/art-working-desk.png",
+    alt: "Planning the day at a desk",
+  },
+  {
+    tag: "Learn & Grow",
+    title: "Turn effort into momentum.",
+    body: "Habits, goals, flashcards, and a Notion-style notebook — all in one place. Track streaks, hit milestones, and let the AI help you study and write.",
+    img: "/art-knowledge-tree.png",
+    alt: "Knowledge growing like a tree from books",
+  },
+  {
+    tag: "Connect & Act",
+    title: "Your calendar and inbox, handled.",
+    body: "Google Calendar and Gmail flow in automatically. Actionable emails become tasks, and the AI drafts and sends replies on your behalf — you just review.",
+    img: "/art-network.png",
+    alt: "Two people connected by a network",
+  },
 ];
 
 const FEATURES = [
-  { title: "Smart tasks & deadlines", body: "AI breakdowns, urgency ranking, and a clear view of what's next.", span: "md:col-span-2" },
-  { title: "Calendar & Gmail sync", body: "Live meetings, plus actionable emails turned into tasks." },
+  { title: "Smart tasks & deadlines", body: "AI breakdowns, urgency ranking, a clear view of next.", span: "md:col-span-2" },
+  { title: "Calendar & Gmail sync", body: "Live meetings, emails turned into tasks." },
   { title: "AI email writing", body: "Describe it, review the draft, send from Gmail." },
-  { title: "Notion-style notes", body: "Slash commands, tables, and an AI writing assistant." },
-  { title: "Focus, habits & goals", body: "Pomodoro timer, streak tracking, milestone progress.", span: "md:col-span-2" },
+  { title: "Notion-style notes", body: "Slash commands, tables, AI writing help." },
+  { title: "Focus, habits & goals", body: "Pomodoro, streaks, milestone progress.", span: "md:col-span-2" },
 ];
 
 const STATS = [
@@ -169,8 +130,8 @@ export default function Landing() {
       </header>
 
       {/* Hero */}
-      <section className="relative mx-auto max-w-6xl px-6 pb-10 pt-36 text-center">
-        <div className="pointer-events-none absolute left-1/2 top-20 -z-10 h-[26rem] w-[26rem] -translate-x-1/2 rounded-full bg-accent/10 blur-[120px]" aria-hidden />
+      <section className="relative mx-auto max-w-6xl px-6 pb-12 pt-36 text-center">
+        <div className="pointer-events-none absolute left-1/2 top-20 -z-10 h-[24rem] w-[24rem] -translate-x-1/2 rounded-full bg-accent/10 blur-[120px]" aria-hidden />
         <motion.span
           initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}
           className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/8 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent">
@@ -205,29 +166,37 @@ export default function Landing() {
           </a>
         </motion.div>
 
+        {/* Hero showpiece — the branded sketch banner */}
         <motion.div
           initial={{ opacity: 0, y: 40, scale: 0.97 }} animate={{ opacity: 1, y: 0, scale: 1 }} transition={{ duration: 0.9, ease: EASE, delay: 0.4 }}
-          className="mx-auto mt-16 max-w-2xl">
-          <ProductMock />
+          className="mx-auto mt-16 max-w-4xl">
+          <Plate src="/art-hero-banner.png" alt="Producty — working and learning" />
         </motion.div>
       </section>
 
-      {/* How it works */}
-      <section id="how" className="mx-auto max-w-6xl px-6 py-24">
+      {/* How it works — alternating image / text */}
+      <section id="how" className="mx-auto max-w-6xl px-6 py-20">
         <Reveal className="text-center">
           <span className="text-xs font-semibold uppercase tracking-wider text-accent">How it works</span>
           <h2 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">From mess to momentum.</h2>
         </Reveal>
-        <div className="mt-14 grid gap-6 md:grid-cols-3">
-          {STEPS.map((s, i) => (
-            <Reveal key={s.n} delay={i * 0.08}>
-              <div className="h-full rounded-2xl border border-border bg-bg-surface p-7 shadow-[0_2px_20px_-12px_rgba(27,26,23,0.2)]">
-                <p className="font-display text-3xl font-extrabold text-accent/30">{s.n}</p>
-                <h3 className="mt-4 font-display text-xl font-bold">{s.title}</h3>
-                <p className="mt-2 text-sm leading-relaxed text-text-muted">{s.body}</p>
+
+        <div className="mt-16 space-y-20 md:space-y-28">
+          {STORY.map((s, i) => {
+            const flip = i % 2 === 1;
+            return (
+              <div key={s.tag} className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
+                <Reveal className={flip ? "md:order-2" : ""}>
+                  <span className="inline-block rounded-full border border-accent/30 bg-accent/8 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent">{s.tag}</span>
+                  <h3 className="mt-4 font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">{s.title}</h3>
+                  <p className="mt-4 max-w-md text-base leading-relaxed text-text-muted">{s.body}</p>
+                </Reveal>
+                <Reveal delay={0.1} className={flip ? "md:order-1" : ""}>
+                  <Plate src={s.img} alt={s.alt} />
+                </Reveal>
               </div>
-            </Reveal>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -247,10 +216,17 @@ export default function Landing() {
 
       {/* Features */}
       <section id="features" className="mx-auto max-w-6xl px-6 py-24">
-        <Reveal className="mb-12 text-center">
-          <span className="text-xs font-semibold uppercase tracking-wider text-accent">Everything you need</span>
-          <h2 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">One app. Your whole workflow.</h2>
+        <Reveal className="mb-12 grid items-center gap-8 md:grid-cols-[1.3fr_1fr]">
+          <div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-accent">Everything you need</span>
+            <h2 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">One app. Your whole workflow.</h2>
+            <p className="mt-4 max-w-md text-base leading-relaxed text-text-muted">
+              No more juggling six tools. Tasks, calendar, notes, habits, and an AI assistant — together, and free.
+            </p>
+          </div>
+          <Plate src="/art-icons.png" alt="A toolkit of productivity essentials" />
         </Reveal>
+
         <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {FEATURES.map((f, i) => (
             <Reveal key={f.title} delay={i * 0.05} className={f.span || ""}>
