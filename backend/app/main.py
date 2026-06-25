@@ -31,6 +31,7 @@ from app.routers import (
     triage,
     capture,
     infra,
+    gmail,
 )
 
 
@@ -139,6 +140,7 @@ app.include_router(flashcards.router, prefix="/api/flashcards", tags=["flashcard
 app.include_router(triage.router, prefix="/api/triage", tags=["triage"])
 app.include_router(capture.router, prefix="/api/capture", tags=["capture"])
 app.include_router(infra.router, prefix="/api/infra", tags=["infra"])
+app.include_router(gmail.router, prefix="/api/gmail", tags=["gmail"])
 
 
 @app.get("/health")

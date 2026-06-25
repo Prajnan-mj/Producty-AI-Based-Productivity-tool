@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { fetchDailyPlan, fetchAgentPrompt } from "../lib/queries";
+import { fetchDailyPlan, fetchAgentPrompt, composeEmail, sendEmail } from "../lib/queries";
 import { streamChat } from "../lib/chatStream";
 import { useVoice } from "../hooks/useVoice";
 import { CardSkeleton } from "./Skeleton";
@@ -18,6 +18,7 @@ function fmtTime(raw) {
 const TABS = [
   { key: "plan", label: "Daily Plan" },
   { key: "chat", label: "Chat" },
+  { key: "email", label: "Email" },
   { key: "agent", label: "Agent" },
 ];
 
@@ -225,7 +226,113 @@ function ChatTab() {
 }
 
 /* ------------------------------------------------------------------ */
-/* c) Agent Prompt tab                                                 */
+/* c) Email tab — ask the AI to write + send an email                  */
+/* ------------------------------------------------------------------ */
+
+function EmailTab() {
+  const [instruction, setInstruction] = useState("");
+  const [draft, setDraft] = useState(null); // {to, subject, body}
+  const [drafting, setDrafting] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const handleCompose = async () => {
+    const text = instruction.trim();
+    if (!text || drafting) return;
+    setDrafting(true);
+    try {
+      const d = await composeEmail(text, null);
+      setDraft(d);
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Couldn't draft the email.");
+    } finally {
+      setDrafting(false);
+    }
+  };
+
+  const handleSend = async () => {
+    if (!draft || sending) return;
+    if (!draft.to || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(draft.to)) {
+      toast.error("Add a valid recipient email.");
+      return;
+    }
+    setSending(true);
+    try {
+      const res = await sendEmail(draft.to, draft.subject, draft.body);
+      toast.success(res.message || "Email sent!");
+      setDraft(null);
+      setInstruction("");
+    } catch (err) {
+      toast.error(err?.response?.data?.detail || "Failed to send.");
+    } finally {
+      setSending(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-1 flex-col min-h-0 overflow-y-auto p-4 space-y-3">
+      <p className="text-xs text-text-muted">
+        Tell the AI what to write. Example: “Email john@acme.com to reschedule
+        tomorrow's 3pm meeting to Friday.”
+      </p>
+
+      <textarea
+        value={instruction}
+        onChange={(e) => setInstruction(e.target.value)}
+        rows={3}
+        placeholder="What should the email say?"
+        className="w-full resize-none rounded-xl border border-border bg-bg-elevated px-3 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-accent-blue focus:outline-none"
+      />
+      <button onClick={handleCompose} disabled={!instruction.trim() || drafting}
+        className="rounded-lg bg-accent-blue px-3 py-2 text-xs font-bold text-bg-base transition hover:bg-accent-blue/80 disabled:opacity-40">
+        {drafting ? "Drafting…" : "✨ Draft with AI"}
+      </button>
+
+      {draft && (
+        <div className="space-y-2 rounded-xl border border-border bg-bg-base p-3">
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-text-muted">To</label>
+            <input
+              value={draft.to}
+              onChange={(e) => setDraft({ ...draft, to: e.target.value })}
+              placeholder="recipient@example.com"
+              className="mt-1 w-full rounded-lg border border-border bg-bg-elevated px-2.5 py-1.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-text-muted">Subject</label>
+            <input
+              value={draft.subject}
+              onChange={(e) => setDraft({ ...draft, subject: e.target.value })}
+              className="mt-1 w-full rounded-lg border border-border bg-bg-elevated px-2.5 py-1.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none"
+            />
+          </div>
+          <div>
+            <label className="text-[10px] font-semibold uppercase tracking-wider text-text-muted">Body</label>
+            <textarea
+              value={draft.body}
+              onChange={(e) => setDraft({ ...draft, body: e.target.value })}
+              rows={8}
+              className="mt-1 w-full resize-none rounded-lg border border-border bg-bg-elevated px-2.5 py-1.5 text-sm text-text-primary focus:border-accent-blue focus:outline-none"
+            />
+          </div>
+          <div className="flex gap-2">
+            <button onClick={handleSend} disabled={sending}
+              className="flex-1 rounded-lg bg-accent py-2 text-xs font-bold text-text-onaccent transition hover:opacity-90 disabled:opacity-50">
+              {sending ? "Sending…" : "Send Email"}
+            </button>
+            <button onClick={() => setDraft(null)}
+              className="rounded-lg bg-bg-elevated px-3 py-2 text-xs font-semibold text-text-muted hover:text-text-primary">
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* d) Agent Prompt tab                                                 */
 /* ------------------------------------------------------------------ */
 
 function AgentPromptTab() {
@@ -311,6 +418,7 @@ export default function AIPanel({ className = "" }) {
             transition={{ duration: 0.15 }} className="flex flex-1 flex-col min-h-0">
             {tab === "plan" && <DailyPlanTab />}
             {tab === "chat" && <ChatTab />}
+            {tab === "email" && <EmailTab />}
             {tab === "agent" && <AgentPromptTab />}
           </motion.div>
         </AnimatePresence>

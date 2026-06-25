@@ -9,6 +9,12 @@ export const fetchAgentPrompt = () => api.get("/ai/agent-prompt").then((r) => r.
 export const aiPrioritize = () => api.post("/ai/prioritize-now").then((r) => r.data);
 export const fetchFocusSuggestion = () => api.get("/ai/focus").then((r) => r.data);
 
+// Gmail — AI compose + send
+export const composeEmail = (instruction, to) =>
+  api.post("/gmail/compose", { instruction, to }).then((r) => r.data);
+export const sendEmail = (to, subject, body) =>
+  api.post("/gmail/send", { to, subject, body }).then((r) => r.data);
+
 // Tasks
 export const fetchUrgentTasks = () => api.get("/tasks/urgent").then((r) => r.data);
 export const fetchTasks = (params) => api.get("/tasks", { params }).then((r) => r.data);
