@@ -7,6 +7,7 @@ export default function AuthCallback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const setToken = useUserStore((s) => s.setToken);
+  const setUser = useUserStore((s) => s.setUser);
   const [error, setError] = useState(null);
   const exchanged = useRef(false);
 
@@ -22,15 +23,22 @@ export default function AuthCallback() {
     }
 
     api.post("/auth/google/exchange", { code })
-      .then((res) => {
+      .then(async (res) => {
         setToken(res.data.access_token);
+        // Fetch the signed-in user's real profile (name, email, picture).
+        try {
+          const me = await api.get("/auth/me");
+          setUser(me.data);
+        } catch {
+          // Non-fatal — dashboard falls back to a generic greeting.
+        }
         navigate("/dashboard", { replace: true });
       })
       .catch(() => {
         setError("Sign-in failed. Please try again.");
         setTimeout(() => navigate("/login", { replace: true }), 2000);
       });
-  }, [searchParams, setToken, navigate]);
+  }, [searchParams, setToken, setUser, navigate]);
 
   return (
     <div className="flex min-h-dvh items-center justify-center bg-bg-base">

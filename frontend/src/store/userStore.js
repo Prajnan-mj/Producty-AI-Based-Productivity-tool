@@ -1,10 +1,23 @@
 import { create } from "zustand";
 
+function loadStoredUser() {
+  try {
+    const raw = localStorage.getItem("user");
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 const useUserStore = create((set) => ({
-  user: null,
+  user: loadStoredUser(),
   token: localStorage.getItem("token") || null,
 
-  setUser: (user) => set({ user }),
+  setUser: (user) => {
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
+    set({ user });
+  },
 
   setToken: (token) => {
     if (token) localStorage.setItem("token", token);
@@ -14,6 +27,7 @@ const useUserStore = create((set) => ({
 
   logout: () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     set({ user: null, token: null });
     window.location.href = "/login";
   },

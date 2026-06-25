@@ -26,7 +26,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.config import settings
 from app.database import get_db
 from app.models import User
-from app.security import create_access_token, decode_access_token
+from app.security import create_access_token, decode_access_token, get_current_user
 
 import logging
 
@@ -287,3 +287,25 @@ async def refresh_token(
 
     new_jwt = create_access_token(subject=str(user.id))
     return TokenResponse(access_token=new_jwt)
+
+
+# ---------------------------------------------------------------------------
+# 5. GET /me — current signed-in user's profile
+# ---------------------------------------------------------------------------
+
+class MeResponse(BaseModel):
+    id: str
+    email: str
+    name: str | None
+    picture_url: str | None
+
+
+@router.get("/me", response_model=MeResponse)
+async def get_me(user: User = Depends(get_current_user)) -> MeResponse:
+    """Return the currently authenticated user's profile."""
+    return MeResponse(
+        id=str(user.id),
+        email=user.email,
+        name=user.name,
+        picture_url=user.picture_url,
+    )

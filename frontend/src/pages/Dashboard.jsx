@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import useUserStore from "../store/userStore";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -301,6 +302,8 @@ function AiTip({ message }) {
 
 export default function Dashboard() {
   const qc = useQueryClient();
+  const user = useUserStore((s) => s.user);
+  const firstName = user?.name ? user.name.trim().split(/\s+/)[0] : "there";
 
   const plan = useQuery({ queryKey: ["dailyPlan"], queryFn: fetchDailyPlan, retry: false, staleTime: 30 * 60 * 1000 });
   const urgent = useQuery({ queryKey: ["urgentTasks"], queryFn: fetchUrgentTasks, retry: false });
@@ -332,7 +335,7 @@ export default function Dashboard() {
           {/* -------- LEFT COLUMN -------- */}
           <div className="space-y-6">
             <motion.div {...fadeUp}>
-              <p className="font-display text-2xl font-extrabold">{greeting()}, Prajnan</p>
+              <p className="font-display text-2xl font-extrabold">{greeting()}, {firstName}</p>
               <p className="mt-1 text-sm text-text-muted">{today}</p>
             </motion.div>
 
