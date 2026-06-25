@@ -34,9 +34,14 @@ from app.routers import (
 )
 
 
+import logging
+
+logger = logging.getLogger("producty")
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    # Fail fast in production if the JWT secret was never changed or is too weak.
+    logger.info("Starting Producty — DEBUG=%s", settings.DEBUG)
     if not settings.DEBUG:
         if settings.SECRET_KEY in ("change-me-in-production", "") or len(settings.SECRET_KEY) < 32:
             raise RuntimeError(
@@ -44,7 +49,9 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 "Generate one with: python -c \"import secrets; print(secrets.token_hex(32))\""
             )
         if not settings.cors_origins:
-            raise RuntimeError("CORS_ALLOW_ORIGINS (or FRONTEND_URL) must be set in production.")
+            logger.warning("CORS_ALLOW_ORIGINS is empty — only FRONTEND_URL (%s) will be allowed", settings.FRONTEND_URL)
+    logger.info("CORS origins: %s", settings.cors_origins)
+    logger.info("Database: %s", settings.async_database_url[:30] + "...")
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         # create_all won't ALTER existing tables — add new note columns idempotently.

@@ -9,13 +9,10 @@ RUN npm run build
 FROM nginx:alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
 EXPOSE 80
 
-# API_URL is injected into config.js at container start.
-# Set to the backend's public URL, e.g. https://producty-api.onrender.com/api
 ENV API_URL=""
 
-ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["nginx", "-g", "daemon off;"]
+# Inline entrypoint: write config.js with the runtime API_URL, then start nginx.
+# No external shell script = no CRLF line-ending bugs from Windows.
+CMD ["/bin/sh", "-c", "echo \"window.__PRODUCTY_CONFIG__ = { API_URL: \\\"${API_URL}\\\" };\" > /usr/share/nginx/html/config.js && nginx -g 'daemon off;'"]

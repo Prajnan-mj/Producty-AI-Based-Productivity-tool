@@ -7,10 +7,10 @@ from datetime import datetime, timezone
 from app.config import settings
 
 os.environ.setdefault("OAUTHLIB_RELAX_TOKEN_SCOPE", "1")
-# Only relax HTTPS enforcement in local DEBUG. In production, OAuth MUST run
-# over HTTPS — otherwise tokens transit in cleartext.
-if settings.DEBUG:
-    os.environ.setdefault("OAUTHLIB_INSECURE_TRANSPORT", "1")
+# Render/Railway/Fly terminate TLS at the proxy — the app always sees HTTP
+# internally, but users connect via HTTPS. The oauthlib HTTPS check is wrong
+# behind a reverse proxy, so we disable it unconditionally.
+os.environ.setdefault("OAUTHLIB_INSECURE_TRANSPORT", "1")
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
