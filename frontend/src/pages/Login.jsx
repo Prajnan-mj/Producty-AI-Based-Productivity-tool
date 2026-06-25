@@ -6,16 +6,24 @@ import { getGoogleLoginUrl } from "../lib/queries";
 export default function Login() {
   const token = useUserStore((s) => s.token);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  // Already logged in — go to dashboard
   if (token) return <Navigate to="/dashboard" replace />;
 
   const handleLogin = async () => {
     setLoading(true);
+    setError(null);
     try {
       const data = await getGoogleLoginUrl();
-      window.location.href = data.authorization_url;
-    } catch {
+      if (data?.authorization_url) {
+        window.location.href = data.authorization_url;
+      } else {
+        setError("No authorization URL received from server.");
+        setLoading(false);
+      }
+    } catch (err) {
+      const msg = err?.response?.data?.detail || err?.message || "Could not reach the server.";
+      setError(msg);
       setLoading(false);
     }
   };
@@ -45,6 +53,10 @@ export default function Login() {
           </svg>
           {loading ? "Redirecting…" : "Sign in with Google"}
         </button>
+
+        {error && (
+          <p className="mt-4 text-xs text-accent-red">{error}</p>
+        )}
       </div>
     </div>
   );

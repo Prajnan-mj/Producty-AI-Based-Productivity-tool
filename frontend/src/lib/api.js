@@ -1,8 +1,10 @@
 import axios from "axios";
 
 function getApiBase() {
-  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-  if (window.__PRODUCTY_CONFIG__?.API_URL) return window.__PRODUCTY_CONFIG__.API_URL;
+  const vite = import.meta.env.VITE_API_URL;
+  if (vite && vite.length > 0) return vite;
+  const runtime = window.__PRODUCTY_CONFIG__?.API_URL;
+  if (runtime && runtime.length > 0) return runtime;
   return "/api";
 }
 
