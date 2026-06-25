@@ -1,27 +1,26 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap");
-@import url("https://fonts.cdnfonts.com/css/foglihten");
+@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
 /*
-  Producty — editorial luxury minimal.
-  Warm ivory paper canvas · near-black ink · a single terracotta accent.
-  A dark ink sidebar rail provides a magazine-masthead contrast against the
-  light content. Foglihten serif carries the display voice; Geist sets text.
+  Producty — clean modern SaaS (backdoor-inspired).
+  Near-white airy canvas · white cards · soft hairlines · one terracotta accent.
+  A light white sidebar rail keeps the whole surface bright and minimal.
+  Plus Jakarta Sans carries the display voice; Geist sets text.
 
-    #EFE9DE  ivory paper — base canvas
-    #F8F4EC / #FFFFFF  surfaces (cards) & top inputs
-    #1A1714  ink rail — sidebar / dark contrast surfaces
+    #F6F5F2  near-white — app canvas
+    #FFFFFF  cards / sidebar rail
+    #F0EEE9  inputs & hover tints
     #B4522E  terracotta — the single accent (headings, actions, AI)
-    #211D18  ink — primary text · #7A7065 taupe — muted text
-    #E4DCCE  soft hairline separators
+    #1B1A17  near-black ink — primary text · #6E6A62 — muted text
+    #ECEAE5  soft hairline separators
     #C2334D  cool crimson — functional danger only (not decorative)
 */
 
 :root {
-  --bg-base: #efe9de;
-  --bg-surface: #f8f4ec;
-  --bg-elevated: #ffffff;
-  --bg-sidebar: #1a1714;
+  --bg-base: #f6f5f2;
+  --bg-surface: #ffffff;
+  --bg-elevated: #f0eee9;
+  --bg-sidebar: #ffffff;
 
   /* The single accent. Every legacy accent-* token funnels into terracotta so
      the whole app reskins without touching class names; crimson stays danger. */
@@ -32,10 +31,10 @@
   --accent-green: #b4522e;
   --accent-red: #c2334d;
 
-  --text-primary: #211d18;
-  --text-muted: #7a7065;
-  --text-onaccent: #f8f4ec; /* text that sits on a terracotta fill */
-  --border: #e4dcce;
+  --text-primary: #1b1a17;
+  --text-muted: #6e6a62;
+  --text-onaccent: #ffffff; /* white text that sits on a terracotta fill */
+  --border: #eceae5;
 }
 
 @theme inline {
@@ -56,7 +55,7 @@
   --color-text-onaccent: var(--text-onaccent);
   --color-border: var(--border);
 
-  --font-display: "Foglihten", "Geist", Georgia, serif;
+  --font-display: "Plus Jakarta Sans", "Geist", system-ui, sans-serif;
   --font-body: "Geist", system-ui, -apple-system, sans-serif;
   --font-mono: "Geist Mono", ui-monospace, monospace;
 }
@@ -81,17 +80,18 @@ body {
   min-height: 100dvh;
 }
 
-/* Display face carries the personality — editorial serif on headings/brand. */
+/* Display face — modern geometric sans on headings/brand. */
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: 0.01em;
-  font-feature-settings: "liga", "dlig", "swsh";
+  letter-spacing: -0.012em;
+  font-feature-settings: "kern", "liga", "calt";
+  font-weight: 700;
 }
 
-/* Editorial flourish: tighten large display headings for a set, printed feel. */
+/* Tighten large display headings for a crisp, modern-SaaS feel. */
 h1.font-display,
 h2.font-display {
-  letter-spacing: -0.01em;
+  letter-spacing: -0.028em;
 }
 
 /* ---- Smooth scrolling (Lenis sets these; safe no-ops otherwise) ---- */
@@ -112,18 +112,18 @@ html.lenis body {
 /* ---- Thin, restrained scrollbars ---- */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #c9bda9 transparent;
+  scrollbar-color: #d8d6cf transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #d2c7b3;
+  background: #dddbd3;
   border-radius: 999px;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: #bdae95;
+  background: #c9c6bd;
 }
 *::-webkit-scrollbar-track {
   background: transparent;
