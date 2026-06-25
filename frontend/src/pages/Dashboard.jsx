@@ -118,18 +118,18 @@ function DailyPlanWidget({ data, isLoading }) {
   if (!data) return null;
 
   const sections = [
-    { title: "Morning", icon: "☀️", blocks: data.morning_blocks },
-    { title: "Afternoon", icon: "🌤️", blocks: data.afternoon_blocks },
-    { title: "Evening", icon: "🌙", blocks: data.evening_blocks },
+    { title: "Morning", blocks: data.morning_blocks },
+    { title: "Afternoon", blocks: data.afternoon_blocks },
+    { title: "Evening", blocks: data.evening_blocks },
   ];
 
   return (
     <div className="rounded-xl border border-border bg-bg-surface p-5 space-y-4">
       <h3 className="font-display text-sm font-bold text-text-muted uppercase tracking-wider">Daily Plan</h3>
-      {sections.map(({ title, icon, blocks }) =>
+      {sections.map(({ title, blocks }) =>
         blocks?.length > 0 && (
           <div key={title} className="space-y-2">
-            <p className="text-xs font-medium text-text-muted">{icon} {title}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-text-muted">{title}</p>
             {blocks.map((b, i) => (
               <div key={i} className="flex items-center gap-2 rounded-lg bg-bg-elevated/50 px-3 py-2">
                 <span className="font-mono text-[11px] text-accent-blue w-14 shrink-0">{fmtTime(b.time)}</span>
@@ -166,8 +166,9 @@ function UrgencyFeed({ tasks, summary, isLoading, onDone, onSnooze }) {
       )}
 
       {items.length === 0 && (
-        <div className="rounded-xl border border-border bg-bg-surface p-8 text-center text-text-muted text-sm">
-          No urgent tasks — you're clear! 🎉
+        <div className="rounded-xl border border-border bg-bg-surface p-8 text-center">
+          <p className="text-sm font-semibold text-text-primary">Nothing urgent</p>
+          <p className="mt-1 text-sm text-text-muted">Plan your next move.</p>
         </div>
       )}
 
@@ -280,12 +281,16 @@ function MomentumWidget() {
   const momQ = useQuery({ queryKey: ["momentum"], queryFn: fetchMomentum, retry: false });
   const m = momQ.data;
   if (!m) return null;
-  const trendIcon = { improving: "📈", steady: "➡️", slipping: "📉" }[m.recent_trend] || "➡️";
+  const trend = {
+    improving: { label: "Improving", cls: "text-accent" },
+    steady: { label: "Steady", cls: "text-text-muted" },
+    slipping: { label: "Slipping", cls: "text-accent-red" },
+  }[m.recent_trend] || { label: "Steady", cls: "text-text-muted" };
   return (
     <div className="rounded-xl border border-border bg-bg-surface p-5">
       <div className="flex items-center justify-between">
         <h3 className="font-display text-sm font-bold text-text-muted uppercase tracking-wider">Momentum</h3>
-        <span>{trendIcon}</span>
+        <span className={`text-[11px] font-semibold uppercase tracking-wide ${trend.cls}`}>{trend.label}</span>
       </div>
       <div className="mt-2 flex items-end gap-2">
         <span className="font-mono text-3xl font-bold text-accent">{m.streak_pct}%</span>
@@ -299,9 +304,9 @@ function MomentumWidget() {
 function AiTip({ message }) {
   if (!message) return null;
   return (
-    <div className="rounded-xl border border-accent-purple/20 bg-accent-purple/5 p-4 flex items-start gap-3">
-      <span className="text-lg">✨</span>
-      <p className="text-sm text-text-muted italic leading-relaxed">{message}</p>
+    <div className="flex items-start gap-3 rounded-xl border-l-2 border-accent bg-accent/5 p-4">
+      <span className="shrink-0 pt-0.5 text-[10px] font-bold uppercase tracking-[0.18em] text-accent">AI</span>
+      <p className="text-sm leading-relaxed text-text-muted">{message}</p>
     </div>
   );
 }

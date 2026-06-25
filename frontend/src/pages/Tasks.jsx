@@ -20,7 +20,7 @@ const PRI_COLORS = {
   low: "bg-accent-green/15 text-accent-green",
 };
 
-const SOURCE_ICONS = { gmail: "📧", voice: "🎙️", document: "📄", manual: "" };
+const SOURCE_TAGS = { gmail: "Gmail", voice: "Voice", document: "Doc", manual: "" };
 
 /**
  * Deadline-based urgency bucket:
@@ -112,7 +112,9 @@ function SortableTaskCard({ task, onDone, onDelete }) {
             {task.priority === "high" ? "urgent" : task.priority}
           </span>
           {task.deadline && <span className={`font-mono text-[11px] ${URGENCY_TEXT[urgency]}`}>{countdown(task.deadline)}</span>}
-          {task.source !== "manual" && <span className="text-xs">{SOURCE_ICONS[task.source]}</span>}
+          {task.source !== "manual" && SOURCE_TAGS[task.source] && (
+            <span className="rounded-full bg-bg-elevated px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-text-muted">{SOURCE_TAGS[task.source]}</span>
+          )}
         </div>
       </div>
 
@@ -137,7 +139,7 @@ function AiPanel({ data, onApply, onApplyAll, onClose }) {
     <motion.div initial={{ x: 300, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 300, opacity: 0 }}
       className="fixed right-0 top-0 z-40 flex h-full w-80 flex-col border-l border-border bg-bg-surface shadow-xl lg:static lg:h-auto lg:rounded-xl lg:border">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h3 className="font-display text-sm font-bold text-accent-purple">✨ AI Priorities</h3>
+        <h3 className="font-display text-sm font-bold text-accent">AI Priorities</h3>
         <div className="flex gap-2">
           <button onClick={onApplyAll} className="rounded-md bg-accent-purple px-2 py-1 text-[10px] font-semibold text-bg-base hover:bg-accent-purple/80">Apply All</button>
           <button onClick={onClose} className="text-text-muted hover:text-text-primary">✕</button>
@@ -243,8 +245,8 @@ function InlineAdd() {
       <input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)}
         className="rounded-lg bg-bg-elevated px-2 py-1 text-[11px] text-text-primary focus:outline-none" />
       <button type="button" onClick={() => setUrgent(!urgent)}
-        className={`rounded-lg px-3 py-1 text-[11px] font-semibold transition ${urgent ? "bg-accent-red text-bg-base" : "bg-bg-elevated text-text-muted"}`}>
-        {urgent ? "🔥 Urgent" : "Not urgent"}
+        className={`rounded-lg px-3 py-1 text-[11px] font-semibold transition ${urgent ? "bg-accent-red text-white" : "bg-bg-elevated text-text-muted"}`}>
+        {urgent ? "Urgent" : "Not urgent"}
       </button>
       <button type="submit" disabled={!title.trim() || mut.isPending}
         className="rounded-lg bg-accent-blue/10 px-3 py-1 text-xs font-semibold text-accent-blue hover:bg-accent-blue/20 disabled:opacity-50">Add</button>
@@ -303,7 +305,7 @@ export default function Tasks() {
     });
   }
 
-  const doneMut = useMutation({ mutationFn: markTaskDone, onSuccess: () => { toast.success("Task done! ✅"); qc.invalidateQueries({ queryKey: ["tasks"] }); } });
+  const doneMut = useMutation({ mutationFn: markTaskDone, onSuccess: () => { toast.success("Marked done"); qc.invalidateQueries({ queryKey: ["tasks"] }); } });
   const delMut = useMutation({ mutationFn: deleteTask, onSuccess: () => { toast.success("Task deleted"); qc.invalidateQueries({ queryKey: ["tasks"] }); } });
   const gmailMut = useMutation({ mutationFn: () => importFromGmail(20), onSuccess: (d) => { toast.success(`${d.length} tasks imported from Gmail`); qc.invalidateQueries({ queryKey: ["tasks"] }); } });
 
@@ -335,11 +337,11 @@ export default function Tasks() {
           <div className="flex gap-2">
             <button onClick={() => gmailMut.mutate()} disabled={gmailMut.isPending}
               className="flex items-center gap-1.5 rounded-lg bg-bg-surface border border-border px-3 py-1.5 text-xs font-semibold text-text-muted hover:text-text-primary transition disabled:opacity-50">
-              📧 {gmailMut.isPending ? "Scanning…" : "Import Gmail"}
+              {gmailMut.isPending ? "Scanning…" : "Import Gmail"}
             </button>
             <button onClick={() => priMut.mutate()} disabled={priMut.isPending}
-              className="flex items-center gap-1.5 rounded-lg bg-accent-purple/10 px-3 py-1.5 text-xs font-semibold text-accent-purple hover:bg-accent-purple/20 transition disabled:opacity-50">
-              ✨ {priMut.isPending ? "Thinking…" : "AI Prioritize"}
+              className="flex items-center gap-1.5 rounded-lg bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/20 transition disabled:opacity-50">
+              {priMut.isPending ? "Thinking…" : "AI Prioritize"}
             </button>
           </div>
         </div>
@@ -381,9 +383,9 @@ export default function Tasks() {
         {tasksQ.isLoading ? (
           <div className="space-y-3"><CardSkeleton /><CardSkeleton /><CardSkeleton /></div>
         ) : orderedTasks.length === 0 ? (
-          <div className="rounded-xl border border-border bg-bg-surface p-10 text-center space-y-3">
-            <p className="text-lg">📋</p>
-            <p className="text-sm text-text-muted">No tasks yet. Add one with voice or type below.</p>
+          <div className="rounded-xl border border-border bg-bg-surface p-10 text-center">
+            <p className="text-sm font-semibold text-text-primary">No tasks yet</p>
+            <p className="mt-1 text-sm text-text-muted">Add one with voice, or type below.</p>
           </div>
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
