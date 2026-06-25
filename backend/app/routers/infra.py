@@ -538,3 +538,54 @@ async def fire_reminder(
         "item_type": r.item_type,
         "payload": r.payload,
     }
+
+
+# ---------------------------------------------------------------------------
+# Stats endpoint — public view of app usage
+# ---------------------------------------------------------------------------
+
+class AppStats(BaseModel):
+    total_users: int
+    active_users_30d: int
+    new_users_today: int
+    total_tasks: int
+    total_habits: int
+    total_notes: int
+    total_goals: int
+    total_bills: int
+
+
+@router.get("/stats", response_model=AppStats)
+async def get_app_stats(db: AsyncSession = Depends(get_db)) -> AppStats:
+    """Public stats: total users, content counts, etc."""
+    from app.models import User, Task, Habit, Note, Goal, Bill
+
+    now = datetime.now(timezone.utc)
+    thirty_days_ago = now - timedelta(days=30)
+    today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    total_users = (await db.execute(select(func.count(User.id)))).scalar() or 0
+    active_30d = (
+        await db.execute(
+            select(func.count(User.id)).where(User.created_at >= thirty_days_ago)
+        )
+    ).scalar() or 0
+    new_today = (
+        await db.execute(select(func.count(User.id)).where(User.created_at >= today))
+    ).scalar() or 0
+    total_tasks = (await db.execute(select(func.count(Task.id)))).scalar() or 0
+    total_habits = (await db.execute(select(func.count(Habit.id)))).scalar() or 0
+    total_notes = (await db.execute(select(func.count(Note.id)))).scalar() or 0
+    total_goals = (await db.execute(select(func.count(Goal.id)))).scalar() or 0
+    total_bills = (await db.execute(select(func.count(Bill.id)))).scalar() or 0
+
+    return AppStats(
+        total_users=total_users,
+        active_users_30d=active_30d,
+        new_users_today=new_today,
+        total_tasks=total_tasks,
+        total_habits=total_habits,
+        total_notes=total_notes,
+        total_goals=total_goals,
+        total_bills=total_bills,
+    )
