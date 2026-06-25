@@ -30,12 +30,14 @@ export default function Privacy() {
         </Section>
 
         <Section title="Information We Collect">
-          <p>When you sign in with Google, with your explicit consent, we access:</p>
+          <p>When you sign in with Google, with your explicit consent, we request the following OAuth scopes:</p>
           <ul className="list-disc space-y-1 pl-5">
-            <li><strong className="text-text-primary">Profile information</strong> — your name, email address, and profile picture, used to create and identify your account.</li>
-            <li><strong className="text-text-primary">Google Calendar</strong> — your calendar events, used to display your meetings and deadlines inside the app and to help plan your day.</li>
-            <li><strong className="text-text-primary">Gmail (read-only)</strong> — we scan recent emails only to detect actionable tasks and deadlines that you can choose to import. We never read, store, or transmit your full inbox.</li>
-            <li><strong className="text-text-primary">Gmail (send)</strong> — only when you explicitly draft and click “Send,” we send an email on your behalf. We do not send anything automatically.</li>
+            <li><strong className="text-text-primary">openid</strong> — associates you with your Google identity for authentication.</li>
+            <li><strong className="text-text-primary">…/auth/userinfo.email</strong> — your primary Google email address, used to create and identify your account.</li>
+            <li><strong className="text-text-primary">…/auth/userinfo.profile</strong> — your name and profile picture, shown in the app interface.</li>
+            <li><strong className="text-text-primary">…/auth/calendar</strong> — your Google Calendar events, used to display your meetings and deadlines and to help plan your day.</li>
+            <li><strong className="text-text-primary">…/auth/gmail.readonly</strong> — read-only access used solely to scan recent emails for actionable tasks and deadlines you can choose to import. We never read, store, or transmit your full inbox.</li>
+            <li><strong className="text-text-primary">…/auth/gmail.send</strong> — used only when you explicitly draft and click “Send” to send an email on your behalf. We never send anything automatically.</li>
           </ul>
           <p>We also store the content you create in the app: tasks, notes, habits, goals, bills, and journal entries.</p>
         </Section>
@@ -95,6 +97,24 @@ export default function Privacy() {
 
         <Section title="Children's Privacy">
           <p>Producty is not directed to children under 13, and we do not knowingly collect their data.</p>
+        </Section>
+
+        <Section title="Disclaimer and Limitation of Liability">
+          <p>
+            Producty is provided on an “as is” and “as available” basis, without warranties of any
+            kind, whether express or implied. To the fullest extent permitted by law, the operator
+            of Producty accepts <strong className="text-text-primary">no liability whatsoever</strong> for
+            any direct, indirect, incidental, special, consequential, or exemplary damages — including
+            but not limited to loss of data, loss of profits, missed deadlines, unauthorized access,
+            service interruptions, or any consequences arising from AI-generated content (such as
+            emails drafted or sent through the app) — even if advised of the possibility of such damages.
+          </p>
+          <p>
+            You use Producty entirely at your own risk. You are solely responsible for reviewing all
+            AI-generated content before relying on or sending it, and for any actions taken through
+            the Service. By using Producty you acknowledge and accept that the operator is not liable
+            for any outcome related to your use of the app.
+          </p>
         </Section>
 
         <Section title="Changes to This Policy">

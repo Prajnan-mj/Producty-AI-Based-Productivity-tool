@@ -88,9 +88,19 @@ export default function Terms() {
 
         <Section title="9. Limitation of Liability">
           <p>
-            To the maximum extent permitted by law, we are not liable for any indirect, incidental,
-            or consequential damages arising from your use of the Service, including any loss of
-            data or any consequences of AI-generated content you choose to act upon.
+            To the fullest extent permitted by law, the operator of Producty shall
+            <strong className="text-text-primary"> not be liable for anything </strong>
+            arising out of or related to your use of the Service. This includes, without limitation,
+            any direct, indirect, incidental, special, consequential, punitive, or exemplary damages;
+            any loss of data, profits, revenue, or goodwill; missed deadlines; unauthorized access to
+            your account or data; service interruptions or errors; and any consequences of
+            AI-generated content, including emails drafted or sent through the Service.
+          </p>
+          <p>
+            You use the Service entirely at your own risk and are solely responsible for reviewing
+            and verifying any AI-generated content before sending it or acting on it. In no event
+            shall the operator’s total liability exceed the amount you paid to use the Service, which
+            for a free service is zero.
           </p>
         </Section>
 
