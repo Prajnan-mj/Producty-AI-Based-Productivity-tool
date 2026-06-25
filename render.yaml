@@ -1,0 +1,51 @@
+services:
+  # ── Backend (FastAPI) ──────────────────────────────────────────────
+  - type: web
+    name: producty-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: producty-db
+          property: connectionString
+      - key: REDIS_URL
+        value: ""
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: NVIDIA_API_KEY
+        sync: false
+      - key: NVIDIA_MODEL
+        value: meta/llama-3.3-70b-instruct
+      - key: LLM_PROVIDER
+        value: nvidia
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "false"
+      - key: FRONTEND_URL
+        sync: false
+      - key: CORS_ALLOW_ORIGINS
+        sync: false
+
+  # ── Frontend (React + Nginx) ───────────────────────────────────────
+  - type: web
+    name: producty-web
+    runtime: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    envVars:
+      - key: API_URL
+        sync: false  # set to https://producty-api.onrender.com after deploy
+
+# ── Managed PostgreSQL ───────────────────────────────────────────────
+databases:
+  - name: producty-db
+    plan: free
