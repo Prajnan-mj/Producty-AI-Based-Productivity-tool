@@ -2,14 +2,14 @@ import { useState } from "react";
 import { BubbleMenu } from "@tiptap/react/menus";
 
 const TEXT_COLORS = [
-  "#e7eaed", "#8a929b", "#ffb000", "#ffc04d", "#ff4d4d", "#b07a1e",
-  "#4d7c8a", "#6fb0c4", "#5a6470", "#c9ccd1", "#7fae8a", "#d98a4a",
-  "#cf5b5b", "#9aa2ab", "#3a414a", "#b8bcc2",
+  "#211d18", "#7a7065", "#b4522e", "#9c3f1f", "#c2334d", "#c08a3e",
+  "#6f7d55", "#4f6b4a", "#46403a", "#8a7e6e", "#2f5a3f", "#7b4a2c",
+  "#a35a3a", "#5e564b", "#3a352e", "#a89e90",
 ];
 const HIGHLIGHTS = [
-  "rgba(255,176,0,0.22)", "rgba(255,77,77,0.20)", "rgba(77,124,138,0.26)",
-  "rgba(176,122,30,0.24)", "rgba(90,100,112,0.30)", "rgba(255,192,77,0.18)",
-  "rgba(231,234,237,0.10)", "rgba(138,146,155,0.18)",
+  "rgba(180,82,46,0.22)", "rgba(194,51,77,0.20)", "rgba(111,123,85,0.24)",
+  "rgba(192,138,62,0.24)", "rgba(138,126,110,0.22)", "rgba(156,63,31,0.18)",
+  "rgba(33,29,24,0.10)", "rgba(122,112,101,0.18)",
 ];
 
 function Btn({ active, onClick, title, children }) {

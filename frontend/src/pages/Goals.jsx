@@ -11,10 +11,10 @@ import {
 import { CardSkeleton } from "../components/Skeleton";
 
 const TRACK_COLORS = {
-  on_track: "#FFB000",
-  slightly_behind: "#B07A1E",
-  behind: "#FF4D4D",
-  completed: "#5A6470",
+  on_track: "#B4522E",
+  slightly_behind: "#C08A3E",
+  behind: "#C2334D",
+  completed: "#8A7E6E",
 };
 
 function trackLabel(s) {
@@ -79,7 +79,7 @@ function GoalVisual({ goal }) {
         </div>
         {visual && (
           <span className="rounded-full px-3 py-1 text-xs font-semibold"
-            style={{ background: (visual.on_track ? "#FFB000" : "#FF4D4D") + "18", color: visual.on_track ? "#FFB000" : "#FF4D4D" }}>
+            style={{ background: (visual.on_track ? "#B4522E" : "#C2334D") + "18", color: visual.on_track ? "#B4522E" : "#C2334D" }}>
             {visual.on_track ? "✓ On track" : "⚠ Behind"}
           </span>
         )}
@@ -92,12 +92,12 @@ function GoalVisual({ goal }) {
         <div className="h-56 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#2A2F36" />
-              <XAxis dataKey="date" stroke="#8A929B" fontSize={11} />
-              <YAxis domain={[0, 100]} stroke="#8A929B" fontSize={11} />
-              <Tooltip contentStyle={{ background: "#141A21", border: "1px solid #2A2F36", borderRadius: 8, fontSize: 12 }} />
-              <Line type="monotone" dataKey="percentage" stroke="#5A6470" strokeWidth={2}
-                dot={{ r: 3, fill: "#5A6470" }} animationDuration={800} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#E4DCCE" />
+              <XAxis dataKey="date" stroke="#7A7065" fontSize={11} />
+              <YAxis domain={[0, 100]} stroke="#7A7065" fontSize={11} />
+              <Tooltip contentStyle={{ background: "#FFFFFF", border: "1px solid #E4DCCE", borderRadius: 8, fontSize: 12 }} />
+              <Line type="monotone" dataKey="percentage" stroke="#8A7E6E" strokeWidth={2}
+                dot={{ r: 3, fill: "#8A7E6E" }} animationDuration={800} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -233,7 +233,7 @@ export default function Goals() {
                 className={`w-full rounded-xl border p-4 text-left transition ${selected?.id === g.id ? "border-accent-purple bg-accent-purple/5" : "border-border bg-bg-surface hover:bg-bg-elevated/60"}`}>
                 <p className="text-sm font-medium text-text-primary truncate">{g.title}</p>
                 <div className="mt-2 h-1.5 rounded-full bg-bg-elevated overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${g.progress_percentage}%`, background: TRACK_COLORS[g.on_track_status] || "#5A6470" }} />
+                  <div className="h-full rounded-full" style={{ width: `${g.progress_percentage}%`, background: TRACK_COLORS[g.on_track_status] || "#8A7E6E" }} />
                 </div>
                 <div className="mt-1.5 flex items-center justify-between text-[10px]">
                   <span className="font-mono text-text-muted">{Math.round(g.progress_percentage)}%</span>

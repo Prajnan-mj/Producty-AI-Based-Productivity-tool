@@ -6,6 +6,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
 import { fetchTasks, createTask, updateTask, deleteTask, markTaskDone, importFromGmail, aiPrioritize } from "../lib/queries";
+import Confetti from "../components/Confetti";
 import ProcrastinationAlert from "../components/ProcrastinationAlert";
 import { CardSkeleton } from "../components/Skeleton";
 
@@ -19,8 +20,7 @@ const PRI_COLORS = {
   low: "bg-accent-green/15 text-accent-green",
 };
 
-// Source flags — text tags, not icons.
-const SOURCE_TAGS = { gmail: "GMAIL", voice: "VOICE", document: "DOC", manual: "" };
+const SOURCE_ICONS = { gmail: "📧", voice: "🎙️", document: "📄", manual: "" };
 
 /**
  * Deadline-based urgency bucket:
@@ -35,11 +35,11 @@ function urgencyOf(task) {
   return isToday ? "today" : "future";
 }
 
-const URGENCY_BAR = {
-  overdue: "bg-accent-red",
-  today: "bg-accent-amber",
-  future: "bg-accent-blue",
-  none: "bg-border",
+const URGENCY_BORDER = {
+  overdue: "border-l-accent-red",
+  today: "border-l-accent-amber",
+  future: "border-l-accent-blue",
+  none: "border-l-border",
 };
 
 const URGENCY_TEXT = {
@@ -70,64 +70,59 @@ function SortableTaskCard({ task, onDone, onDelete }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   const done = task.status === "done";
-  const [flipping, setFlipping] = useState(false);
+  const [burst, setBurst] = useState(false);
 
   const urgency = urgencyOf(task);
 
-  // Signature interaction: a mechanical split-flap flip on completion.
   const handleDone = () => {
     if (done) return;
-    setFlipping(true);
-    setTimeout(() => setFlipping(false), 480);
+    setBurst(true);
+    setTimeout(() => setBurst(false), 900);
     onDone(task.id);
   };
 
   return (
-    <motion.div ref={setNodeRef} style={style} layout
-      exit={{ opacity: 0, height: 0 }}
-      className={`group relative flex items-stretch gap-0 bg-bg-surface transition-colors hover:bg-bg-elevated ${done ? "opacity-55" : ""}`}>
+    <motion.div ref={setNodeRef} style={style} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, x: -100 }}
+      className={`group relative flex items-start gap-3 rounded-xl border border-l-4 ${URGENCY_BORDER[urgency]} border-border bg-bg-surface p-4 transition hover:bg-bg-elevated/60 ${done ? "opacity-60" : ""}`}>
 
-      {/* Urgency tick — amber/red signal bar */}
-      <span className={`w-[3px] shrink-0 ${URGENCY_BAR[urgency]}`} />
+      {/* Confetti on completion */}
+      <AnimatePresence>{burst && <Confetti />}</AnimatePresence>
 
-      <div className={`flex flex-1 items-center gap-3 px-4 py-3 ${flipping ? "split-flap" : ""}`}>
-        {/* Drag handle */}
-        <div {...attributes} {...listeners} className="cursor-grab text-text-muted/40 hover:text-text-muted touch-none">
-          <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-            <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
-            <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
-            <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
-          </svg>
-        </div>
-
-        {/* Mark-done — square ledger checkbox */}
-        <button onClick={handleDone} disabled={done} title="Mark done" aria-label="Mark done"
-          className={`flex h-5 w-5 shrink-0 items-center justify-center border transition ${done ? "border-accent bg-accent" : "border-border hover:border-accent"}`}>
-          {done && <svg viewBox="0 0 24 24" fill="none" stroke="var(--text-onaccent)" strokeWidth={3} className="h-3 w-3"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-        </button>
-
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <p className={`truncate text-sm font-medium text-text-primary ${done ? "line-through text-text-muted" : ""}`}>{task.title}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-2.5">
-            <span className={`px-1.5 py-0.5 font-mono text-[10px] font-semibold uppercase tracking-wider ${PRI_COLORS[task.priority] || PRI_COLORS.medium}`}>
-              {task.priority}
-            </span>
-            {task.deadline && <span className={`font-mono text-[11px] uppercase tracking-wide ${URGENCY_TEXT[urgency]}`}>{countdown(task.deadline)}</span>}
-            {task.source !== "manual" && SOURCE_TAGS[task.source] && (
-              <span className="font-mono text-[10px] uppercase tracking-wider text-text-muted/70">{SOURCE_TAGS[task.source]}</span>
-            )}
-          </div>
-        </div>
-
-        {/* Delete */}
-        <button onClick={() => onDelete(task.id)} title="Delete" aria-label="Delete"
-          className="text-text-muted/40 opacity-0 group-hover:opacity-100 hover:text-accent-red transition">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
-            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </button>
+      {/* Drag handle */}
+      <div {...attributes} {...listeners} className="mt-1 cursor-grab text-text-muted/40 hover:text-text-muted touch-none">
+        <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+          <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
+          <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
+          <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
+        </svg>
       </div>
+
+      {/* Check button */}
+      <button onClick={handleDone} disabled={done}
+        className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ${done ? "border-accent-green bg-accent-green" : "border-border hover:border-accent-green"}`}>
+        {done && <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3} className="h-3 w-3"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+      </button>
+
+      {/* Content */}
+      <div className="flex-1 min-w-0">
+        <p className={`text-sm font-medium text-text-primary ${done ? "line-through text-text-muted" : ""}`}>{task.title}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-2">
+          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${PRI_COLORS[task.priority] || PRI_COLORS.medium}`}>
+            {task.priority === "high" ? "urgent" : task.priority}
+          </span>
+          {task.deadline && <span className={`font-mono text-[11px] ${URGENCY_TEXT[urgency]}`}>{countdown(task.deadline)}</span>}
+          {task.source !== "manual" && <span className="text-xs">{SOURCE_ICONS[task.source]}</span>}
+        </div>
+      </div>
+
+      {/* Delete */}
+      <button onClick={() => onDelete(task.id)}
+        className="mt-1 text-text-muted/40 opacity-0 group-hover:opacity-100 hover:text-accent-red transition">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
     </motion.div>
   );
 }
@@ -142,7 +137,7 @@ function AiPanel({ data, onApply, onApplyAll, onClose }) {
     <motion.div initial={{ x: 300, opacity: 0 }} animate={{ x: 0, opacity: 1 }} exit={{ x: 300, opacity: 0 }}
       className="fixed right-0 top-0 z-40 flex h-full w-80 flex-col border-l border-border bg-bg-surface shadow-xl lg:static lg:h-auto lg:rounded-xl lg:border">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h3 className="font-display text-sm font-bold text-accent">AI Priorities</h3>
+        <h3 className="font-display text-sm font-bold text-accent-purple">✨ AI Priorities</h3>
         <div className="flex gap-2">
           <button onClick={onApplyAll} className="rounded-md bg-accent-purple px-2 py-1 text-[10px] font-semibold text-bg-base hover:bg-accent-purple/80">Apply All</button>
           <button onClick={onClose} className="text-text-muted hover:text-text-primary">✕</button>
@@ -248,8 +243,8 @@ function InlineAdd() {
       <input type="datetime-local" value={deadline} onChange={(e) => setDeadline(e.target.value)}
         className="rounded-lg bg-bg-elevated px-2 py-1 text-[11px] text-text-primary focus:outline-none" />
       <button type="button" onClick={() => setUrgent(!urgent)}
-        className={`px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wider transition ${urgent ? "bg-accent-red text-bg-base" : "bg-bg-elevated text-text-muted"}`}>
-        {urgent ? "Urgent" : "Not urgent"}
+        className={`rounded-lg px-3 py-1 text-[11px] font-semibold transition ${urgent ? "bg-accent-red text-bg-base" : "bg-bg-elevated text-text-muted"}`}>
+        {urgent ? "🔥 Urgent" : "Not urgent"}
       </button>
       <button type="submit" disabled={!title.trim() || mut.isPending}
         className="rounded-lg bg-accent-blue/10 px-3 py-1 text-xs font-semibold text-accent-blue hover:bg-accent-blue/20 disabled:opacity-50">Add</button>
@@ -308,7 +303,7 @@ export default function Tasks() {
     });
   }
 
-  const doneMut = useMutation({ mutationFn: markTaskDone, onSuccess: () => { toast.success("Marked done"); qc.invalidateQueries({ queryKey: ["tasks"] }); } });
+  const doneMut = useMutation({ mutationFn: markTaskDone, onSuccess: () => { toast.success("Task done! ✅"); qc.invalidateQueries({ queryKey: ["tasks"] }); } });
   const delMut = useMutation({ mutationFn: deleteTask, onSuccess: () => { toast.success("Task deleted"); qc.invalidateQueries({ queryKey: ["tasks"] }); } });
   const gmailMut = useMutation({ mutationFn: () => importFromGmail(20), onSuccess: (d) => { toast.success(`${d.length} tasks imported from Gmail`); qc.invalidateQueries({ queryKey: ["tasks"] }); } });
 
@@ -339,12 +334,12 @@ export default function Tasks() {
           <h1 className="font-display text-xl font-extrabold">Tasks</h1>
           <div className="flex gap-2">
             <button onClick={() => gmailMut.mutate()} disabled={gmailMut.isPending}
-              className="flex items-center gap-1.5 border border-border bg-bg-surface px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-text-muted hover:text-text-primary transition disabled:opacity-50">
-              {gmailMut.isPending ? "Scanning…" : "Import Gmail"}
+              className="flex items-center gap-1.5 rounded-lg bg-bg-surface border border-border px-3 py-1.5 text-xs font-semibold text-text-muted hover:text-text-primary transition disabled:opacity-50">
+              📧 {gmailMut.isPending ? "Scanning…" : "Import Gmail"}
             </button>
             <button onClick={() => priMut.mutate()} disabled={priMut.isPending}
-              className="flex items-center gap-1.5 border border-accent/40 bg-accent/10 px-3 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-wider text-accent hover:bg-accent/20 transition disabled:opacity-50">
-              {priMut.isPending ? "Thinking…" : "AI Prioritize"}
+              className="flex items-center gap-1.5 rounded-lg bg-accent-purple/10 px-3 py-1.5 text-xs font-semibold text-accent-purple hover:bg-accent-purple/20 transition disabled:opacity-50">
+              ✨ {priMut.isPending ? "Thinking…" : "AI Prioritize"}
             </button>
           </div>
         </div>
@@ -359,12 +354,12 @@ export default function Tasks() {
             { label: "In Progress", val: inProg, cls: "text-accent-blue bg-accent-blue/10" },
             { label: "Done", val: done, cls: "text-accent-green bg-accent-green/10" },
           ].map(({ label, val, cls }) => (
-            <span key={label} className={`px-3 py-1 font-mono text-[11px] font-semibold uppercase tracking-wider ${cls}`}>{val} {label}</span>
+            <span key={label} className={`rounded-full px-3 py-1 text-xs font-semibold ${cls}`}>{val} {label}</span>
           ))}
         </div>
 
         {/* Filter bar */}
-        <div className="flex flex-wrap gap-2 border border-border bg-bg-surface p-2">
+        <div className="flex flex-wrap gap-2 rounded-xl bg-bg-surface p-2">
           <select value={filter.priority} onChange={(e) => { setFilter({ ...filter, priority: e.target.value }); setItems(null); }}
             className="rounded-lg bg-bg-elevated px-3 py-1.5 text-xs text-text-primary focus:outline-none">
             <option value="">All priorities</option>
@@ -386,15 +381,15 @@ export default function Tasks() {
         {tasksQ.isLoading ? (
           <div className="space-y-3"><CardSkeleton /><CardSkeleton /><CardSkeleton /></div>
         ) : orderedTasks.length === 0 ? (
-          <div className="border border-border bg-bg-surface px-6 py-12 text-center">
-            <p className="font-mono text-xs uppercase tracking-[0.25em] text-text-muted">No tasks on the board</p>
-            <p className="mt-2 text-sm text-text-muted">Add one below to start the manifest.</p>
+          <div className="rounded-xl border border-border bg-bg-surface p-10 text-center space-y-3">
+            <p className="text-lg">📋</p>
+            <p className="text-sm text-text-muted">No tasks yet. Add one with voice or type below.</p>
           </div>
         ) : (
           <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext items={orderedTasks.map((t) => t.id)} strategy={verticalListSortingStrategy}>
               <AnimatePresence>
-                <div className="divide-y divide-border border border-border bg-bg-surface">
+                <div className="space-y-2">
                   {orderedTasks.map((t) => (
                     <SortableTaskCard key={t.id} task={t}
                       onDone={(id) => doneMut.mutate(id)}
