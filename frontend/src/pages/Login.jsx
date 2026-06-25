@@ -32,7 +32,7 @@ export default function Login() {
     <div className="flex min-h-dvh items-center justify-center bg-bg-base px-4">
       <div className="w-full max-w-sm rounded-2xl border border-border bg-bg-surface p-8 text-center shadow-xl">
         <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-xl bg-accent-blue/10">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#4F8EF7" strokeWidth={1.5} className="h-7 w-7">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" strokeWidth={1.5} className="h-7 w-7">
             <path d="M12 6v6l4 2" strokeLinecap="round" />
             <circle cx="12" cy="12" r="10" />
           </svg>

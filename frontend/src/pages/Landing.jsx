@@ -384,7 +384,26 @@ export default function Landing() {
   const headline = ["Stop", "organizing.", "Start", "doing."];
 
   return (
-    <div className="relative min-h-dvh overflow-x-clip bg-bg-base text-text-primary">
+    <div
+      className="relative min-h-dvh overflow-x-clip bg-bg-base text-text-primary"
+      style={{
+        // The marketing page stays intentionally dark (dark landing → light app
+        // is a deliberate premium pattern). Re-scope the design tokens locally so
+        // every token-based class inside reverts to the dark editorial palette.
+        "--bg-base": "#171411",
+        "--bg-surface": "#211C18",
+        "--bg-elevated": "#2B251F",
+        "--text-primary": "#F4EFE6",
+        "--text-muted": "#A89E90",
+        "--text-onaccent": "#171411",
+        "--border": "rgba(244,239,230,0.08)",
+        "--accent": "#CB6038",
+        "--accent-blue": "#CB6038",
+        "--accent-purple": "#CB6038",
+        "--accent-amber": "#CB6038",
+        "--accent-green": "#CB6038",
+      }}
+    >
       {/* Scroll progress bar */}
       <motion.div
         style={{ scaleX: progress }}

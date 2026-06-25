@@ -77,7 +77,7 @@ function tomorrowISO() {
   return d.toISOString();
 }
 
-const DONUT_COLORS = ["#34D399", "#2D3148"];
+const DONUT_COLORS = ["#B4522E", "#E4DCCE"];
 
 const fadeUp = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.35 } };
 
@@ -235,7 +235,7 @@ function MeetingsWidget({ data, isLoading }) {
       <h3 className="font-display text-sm font-bold text-text-muted uppercase tracking-wider">Upcoming</h3>
       {meetings.map((m) => (
         <div key={m.id} className="flex items-center gap-3">
-          <div className="h-8 w-1 rounded-full" style={{ background: m.category === "professional" ? "#4F8EF7" : "#A78BFA" }} />
+          <div className="h-8 w-1 rounded-full" style={{ background: m.category === "professional" ? "#6F7D55" : "#8A7E6E" }} />
           <div className="flex-1 min-w-0">
             <p className="text-sm text-text-primary truncate">{m.title}</p>
             <p className="font-mono text-[11px] text-text-muted">

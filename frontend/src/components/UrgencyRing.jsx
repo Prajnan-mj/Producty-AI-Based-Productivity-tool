@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-const COLORS = { green: "#34D399", amber: "#FBBF24", red: "#F87171", purple: "#A78BFA", blue: "#4F8EF7" };
+const COLORS = { green: "#B4522E", amber: "#C08A3E", red: "#C2334D", purple: "#8A7E6E", blue: "#6F7D55" };
 
 function getColor(pct) {
   if (pct >= 80) return COLORS.green;
@@ -23,7 +23,7 @@ export default function UrgencyRing({
   return (
     <div className="flex flex-col items-center gap-1">
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#2D3148" strokeWidth={strokeWidth} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#E4DCCE" strokeWidth={strokeWidth} />
         <motion.circle
           cx={size / 2} cy={size / 2} r={r} fill="none"
           stroke={fill} strokeWidth={strokeWidth} strokeLinecap="round"

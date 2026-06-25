@@ -107,9 +107,9 @@ function durationMin(start, end) {
 }
 
 function deadlineColor(days) {
-  if (days < 3) return "#F87171";
-  if (days <= 7) return "#FBBF24";
-  return "#34D399";
+  if (days < 3) return "#C2334D";
+  if (days <= 7) return "#C08A3E";
+  return "#B4522E";
 }
 
 const TABS = ["all", "personal", "professional"];
@@ -158,7 +158,7 @@ function MeetingCard({ meeting, onCategorize }) {
 
   return (
     <div className="group flex items-start gap-4 rounded-xl border border-border bg-bg-surface p-4 transition hover:bg-bg-elevated/60">
-      <div className="h-full w-1 shrink-0 rounded-full" style={{ background: cat === "professional" ? "#4F8EF7" : "#A78BFA" }} />
+      <div className="h-full w-1 shrink-0 rounded-full" style={{ background: cat === "professional" ? "#6F7D55" : "#8A7E6E" }} />
 
       <div className="flex-1 min-w-0 space-y-1">
         <p className="text-sm font-medium text-text-primary truncate">{meeting.title}</p>

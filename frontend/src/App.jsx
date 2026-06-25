@@ -78,32 +78,45 @@ function Sidebar() {
         )}
       </AnimatePresence>
 
-      <aside className={`fixed inset-y-0 left-0 z-50 flex w-56 flex-col bg-bg-sidebar transition-transform duration-200 lg:static lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
-        <div className="flex items-center gap-2.5 px-5 py-6">
-          <LogoMark size={32} />
-          <Wordmark className="text-lg text-white" />
+      <aside className={`fixed inset-y-0 left-0 z-50 flex w-60 flex-col bg-bg-sidebar shadow-[1px_0_0_rgba(0,0,0,0.06)] transition-transform duration-200 lg:static lg:translate-x-0 ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
+        <div className="flex items-center gap-2.5 px-6 pb-5 pt-7">
+          <LogoMark size={30} />
+          <Wordmark className="text-[1.35rem] text-[#F4EFE6]" />
         </div>
+        <div className="mx-6 mb-2 h-px bg-white/[0.07]" />
 
-        <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-2">
+        <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-3">
           {NAV_GROUPS.map((group) => (
-            <div key={group.label} className="space-y-1">
-              <p className="px-3 pb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">{group.label}</p>
+            <div key={group.label} className="space-y-0.5">
+              <p className="px-3 pb-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-white/35">{group.label}</p>
               {group.items.map(({ to, label, icon }) => (
                 <NavLink key={to} to={to} onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${isActive ? "bg-accent text-text-onaccent" : "text-white/70 hover:bg-black/20 hover:text-white"}`
+                    `group relative flex items-center gap-3 rounded-lg py-2 pl-4 pr-3 text-[0.85rem] transition-colors duration-200 ${
+                      isActive
+                        ? "bg-white/[0.06] font-semibold text-[#F4EFE6]"
+                        : "font-medium text-white/55 hover:bg-white/[0.035] hover:text-white/90"
+                    }`
                   }>
-                  <SidebarIcon d={icon} />
-                  {label}
+                  {({ isActive }) => (
+                    <>
+                      <span className={`absolute left-0 top-1/2 h-5 w-[2.5px] -translate-y-1/2 rounded-full bg-accent transition-opacity duration-200 ${isActive ? "opacity-100" : "opacity-0"}`} />
+                      <span className={isActive ? "text-accent" : "text-current"}>
+                        <SidebarIcon d={icon} />
+                      </span>
+                      {label}
+                    </>
+                  )}
                 </NavLink>
               ))}
             </div>
           ))}
         </nav>
 
-        <div className="px-3 py-3">
+        <div className="px-3 pb-4 pt-2">
+          <div className="mx-3 mb-3 h-px bg-white/[0.07]" />
           <button onClick={logout}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-white/60 transition hover:bg-accent-red/20 hover:text-accent-red">
+            className="flex w-full items-center gap-3 rounded-lg py-2 pl-4 pr-3 text-[0.85rem] font-medium text-white/55 transition hover:bg-accent-red/15 hover:text-accent-red">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
               <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
             </svg>
@@ -111,10 +124,10 @@ function Sidebar() {
           </button>
 
           {/* Legal links */}
-          <div className="mt-2 flex items-center gap-2 px-3 text-[10px] text-white/30">
-            <Link to="/privacy" className="transition hover:text-white/60">Privacy</Link>
+          <div className="mt-3 flex items-center gap-2 px-4 font-mono text-[10px] tracking-wide text-white/25">
+            <Link to="/privacy" className="transition hover:text-white/55">Privacy</Link>
             <span>·</span>
-            <Link to="/terms" className="transition hover:text-white/60">Terms</Link>
+            <Link to="/terms" className="transition hover:text-white/55">Terms</Link>
           </div>
         </div>
       </aside>

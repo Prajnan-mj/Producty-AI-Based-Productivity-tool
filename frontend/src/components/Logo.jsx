@@ -1,6 +1,6 @@
 /**
- * Producty brand mark — an accent-yellow rounded tile with a bold dark
- * check that flicks upward into an arrow, reading as "done + momentum".
+ * Producty brand mark — a terracotta rounded tile with an ivory check that
+ * flicks upward into an arrow, reading as "done + momentum".
  */
 export function LogoMark({ size = 32, className = "" }) {
   return (
@@ -11,7 +11,7 @@ export function LogoMark({ size = 32, className = "" }) {
       <svg
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#1d1d1d"
+        stroke="#F4EFE6"
         strokeWidth={2.6}
         strokeLinecap="round"
         strokeLinejoin="round"

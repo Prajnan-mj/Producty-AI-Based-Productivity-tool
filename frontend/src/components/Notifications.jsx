@@ -7,15 +7,15 @@ export default function Notifications() {
       toastOptions={{
         duration: 3500,
         style: {
-          background: "#1A1D27",
-          color: "#F1F5F9",
-          border: "1px solid #2D3148",
+          background: "#FFFFFF",
+          color: "#211D18",
+          border: "1px solid #E4DCCE",
           borderRadius: "12px",
           fontSize: "13px",
           fontFamily: "Inter, sans-serif",
         },
-        success: { iconTheme: { primary: "#34D399", secondary: "#1A1D27" } },
-        error: { iconTheme: { primary: "#F87171", secondary: "#1A1D27" } },
+        success: { iconTheme: { primary: "#B4522E", secondary: "#FFFFFF" } },
+        error: { iconTheme: { primary: "#C2334D", secondary: "#FFFFFF" } },
       }}
     />
   );
