@@ -1,29 +1,34 @@
 from __future__ import annotations
 
-import redis.asyncio as aioredis
-from redis.exceptions import RedisError
-
 from app.config import settings
 
-# A single shared async Redis connection pool for the app.
-redis_client: aioredis.Redis = aioredis.from_url(
-    settings.REDIS_URL,
-    encoding="utf-8",
-    decode_responses=True,
-)
+redis_client = None
+
+if settings.REDIS_URL:
+    try:
+        import redis.asyncio as aioredis
+        redis_client = aioredis.from_url(
+            settings.REDIS_URL,
+            encoding="utf-8",
+            decode_responses=True,
+        )
+    except Exception:
+        redis_client = None
 
 
 async def safe_get(key: str) -> str | None:
-    """Get a cached value, returning None if Redis is unavailable."""
+    if redis_client is None:
+        return None
     try:
         return await redis_client.get(key)
-    except (RedisError, OSError):
+    except Exception:
         return None
 
 
 async def safe_set(key: str, value: str, ttl_seconds: int) -> None:
-    """Set a cached value, silently ignoring Redis unavailability."""
+    if redis_client is None:
+        return
     try:
         await redis_client.set(key, value, ex=ttl_seconds)
-    except (RedisError, OSError):
+    except Exception:
         pass
