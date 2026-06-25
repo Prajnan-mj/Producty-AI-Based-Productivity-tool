@@ -17,7 +17,6 @@ A full-stack AI productivity application that combines task management, habit tr
 - [Deployment](#deployment)
 - [Security](#security)
 - [Screenshots](#screenshots)
-- [License](#license)
 
 ---
 
