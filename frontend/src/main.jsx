@@ -6,6 +6,9 @@ import "./index.css";
 
 import AppShell from "./App";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Landing from "./pages/Landing";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import Login from "./pages/Login";
 import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
@@ -35,6 +38,9 @@ createRoot(document.getElementById("root")).render(
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
+          <Route path="/" element={<Landing />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="/login" element={<Login />} />
           <Route path="/auth/callback" element={<AuthCallback />} />
           <Route path="/share/panic/:token" element={<SharedPanic />} />
