@@ -198,30 +198,51 @@ async def calendar_debug(
     except Exception as exc:  # noqa: BLE001
         out["tokeninfo_error"] = str(exc)
 
-    # Try an actual calendar read and report the real error.
+    # List ALL calendars and scan each one for events (past 7d → next 60d).
     try:
         creds = _get_google_credentials(user)
         await _persist_refreshed_token(creds, user, db)
         service = _build_calendar_service(creds)
         now = datetime.now(timezone.utc)
-        events_result = (
-            service.events()
-            .list(
-                calendarId="primary",
-                timeMin=now.isoformat(),
-                timeMax=(now + timedelta(days=30)).isoformat(),
-                singleEvents=True,
-                orderBy="startTime",
-                maxResults=10,
-            )
-            .execute()
-        )
-        events = events_result.get("items", [])
+        time_min = (now - timedelta(days=7)).isoformat()
+        time_max = (now + timedelta(days=60)).isoformat()
+
+        cal_list = service.calendarList().list().execute()
+        calendars = cal_list.get("items", [])
+        out["calendars"] = []
+
+        for cal in calendars:
+            cal_id = cal["id"]
+            try:
+                ev_res = (
+                    service.events()
+                    .list(
+                        calendarId=cal_id,
+                        timeMin=time_min,
+                        timeMax=time_max,
+                        singleEvents=True,
+                        orderBy="startTime",
+                        maxResults=20,
+                    )
+                    .execute()
+                )
+                events = ev_res.get("items", [])
+            except Exception as exc:  # noqa: BLE001
+                out["calendars"].append({"id": cal_id, "error": str(exc)})
+                continue
+
+            out["calendars"].append({
+                "id": cal_id,
+                "summary": cal.get("summary"),
+                "primary": cal.get("primary", False),
+                "events_found": len(events),
+                "sample": [
+                    {"title": e.get("summary"), "start": e.get("start")}
+                    for e in events[:5]
+                ],
+            })
+
         out["calendar_read_ok"] = True
-        out["events_found"] = len(events)
-        out["sample_events"] = [
-            {"title": e.get("summary"), "start": e.get("start")} for e in events[:5]
-        ]
     except Exception as exc:  # noqa: BLE001
         out["calendar_read_ok"] = False
         out["calendar_error"] = f"{type(exc).__name__}: {exc}"
