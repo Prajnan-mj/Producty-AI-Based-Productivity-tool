@@ -46,15 +46,22 @@ export default function Login() {
 
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
-      {/* Left — artwork panel (desktop only) */}
-      <div className="relative hidden flex-col justify-between overflow-hidden border-r border-border bg-[#f3eee4] p-10 lg:flex">
-        <span className="font-display text-xl font-extrabold tracking-tight text-text-primary">Producty</span>
-        <img src="/art-working-desk.webp" alt="Planning the day at a desk"
-          className="mx-auto w-full max-w-md rounded-2xl border border-border object-cover shadow-[0_30px_70px_-25px_rgba(27,26,23,0.35)]" />
-        <p className="max-w-sm text-sm leading-relaxed text-text-muted">
-          One calm place for your tasks, calendar, notes, and goals — with an AI assistant
-          that plans your day and drafts your emails.
-        </p>
+      {/* Left — full-bleed artwork (desktop only) */}
+      <div className="relative hidden overflow-hidden lg:block">
+        <img src="/art-hero-banner.webp" alt="Producty — Working and Learning"
+          className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+        <div className="relative flex h-full flex-col justify-between p-10">
+          <span className="font-display text-xl font-extrabold tracking-tight text-white drop-shadow-lg">Producty</span>
+          <div className="max-w-sm">
+            <p className="text-lg font-semibold leading-snug text-white drop-shadow-lg">
+              One calm place for your tasks, calendar, notes, and goals.
+            </p>
+            <p className="mt-2 text-sm leading-relaxed text-white/70">
+              With an AI assistant that plans your day and drafts your emails.
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Right — sign-in card */}

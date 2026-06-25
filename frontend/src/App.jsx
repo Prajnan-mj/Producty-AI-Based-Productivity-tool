@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { NavLink, Outlet, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Lenis from "lenis";
@@ -9,7 +9,10 @@ import AIPanel from "./components/AIPanel";
 import CursorFollower from "./components/CursorFollower";
 import CommandPalette from "./components/CommandPalette";
 import KeyboardHelp from "./components/KeyboardHelp";
+import PanicButton from "./components/PanicButton";
+import ProfileDropdown, { useSidebarToggles } from "./components/ProfileDropdown";
 import { LogoMark, Wordmark } from "./components/Logo";
+import api from "./lib/api";
 
 function AiToggleButton() {
   const toggleAiPanel = useUiStore((s) => s.toggleAiPanel);
@@ -67,7 +70,7 @@ function SidebarIcon({ d }) {
 
 function Sidebar() {
   const { sidebarOpen, setSidebarOpen } = useUiStore();
-  const logout = useUserStore((s) => s.logout);
+  const { toggles } = useSidebarToggles();
 
   return (
     <>
@@ -86,10 +89,13 @@ function Sidebar() {
         <div className="mx-6 mb-2 h-px bg-border" />
 
         <nav className="flex-1 space-y-6 overflow-y-auto px-3 py-3">
-          {NAV_GROUPS.map((group) => (
+          {NAV_GROUPS.map((group) => {
+            const visibleItems = group.items.filter(({ to }) => toggles[to.replace("/", "")] !== false);
+            if (visibleItems.length === 0) return null;
+            return (
             <div key={group.label} className="space-y-0.5">
               <p className="px-3 pb-1.5 font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted/70">{group.label}</p>
-              {group.items.map(({ to, label, icon }) => (
+              {visibleItems.map(({ to, label, icon }) => (
                 <NavLink key={to} to={to} onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
                     `group relative flex items-center gap-3 rounded-lg py-2 pl-4 pr-3 text-[0.85rem] transition-colors duration-200 ${
@@ -110,18 +116,13 @@ function Sidebar() {
                 </NavLink>
               ))}
             </div>
-          ))}
+          );
+          })}
         </nav>
 
         <div className="px-3 pb-4 pt-2">
           <div className="mx-3 mb-3 h-px bg-border" />
-          <button onClick={logout}
-            className="flex w-full items-center gap-3 rounded-lg py-2 pl-4 pr-3 text-[0.85rem] font-medium text-text-muted transition hover:bg-accent-red/10 hover:text-accent-red">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
-              <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-            </svg>
-            Sign Out
-          </button>
+          <PanicButton compact />
 
           {/* Legal links */}
           <div className="mt-3 flex items-center gap-2 px-4 font-mono text-[10px] tracking-wide text-text-muted/60">
@@ -179,9 +180,10 @@ export default function AppShell() {
         </svg>
       </button>
 
-      {/* Tablet/mobile: toggle the AI panel (always docked on xl+). */}
-      <div className="fixed right-4 top-4 z-30 xl:hidden">
-        <AiToggleButton />
+      {/* Top-right: profile + AI toggle */}
+      <div className="fixed right-4 top-4 z-30 flex items-center gap-2">
+        <ProfileDropdown />
+        <div className="xl:hidden"><AiToggleButton /></div>
       </div>
 
       <div className="hidden xl:flex">

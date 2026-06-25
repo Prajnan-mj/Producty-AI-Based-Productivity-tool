@@ -22,6 +22,8 @@ export const createTask = (data) => api.post("/tasks", data).then((r) => r.data)
 export const updateTask = (id, data) => api.patch(`/tasks/${id}`, data).then((r) => r.data);
 export const deleteTask = (id) => api.delete(`/tasks/${id}`).then((r) => r.data);
 export const markTaskDone = (id) => updateTask(id, { status: "done" });
+export const breakdownTask = (id) => api.post(`/tasks/${id}/breakdown`).then((r) => r.data);
+export const getSubtasks = (id) => api.get(`/tasks/${id}/subtasks`).then((r) => r.data);
 export const importFromGmail = (max) => api.get("/tasks/from-gmail", { params: { max_results: max } }).then((r) => r.data);
 export const fetchProcrastination = () => api.get("/tasks/procrastination/flagged").then((r) => r.data);
 export const breakIntoChunks = (id) => api.post(`/tasks/${id}/break-into-chunks`).then((r) => r.data);

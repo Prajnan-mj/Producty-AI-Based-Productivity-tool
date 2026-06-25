@@ -52,7 +52,7 @@ export function PanicPlanView({ plan }) {
   );
 }
 
-export default function PanicButton({ className = "" }) {
+export default function PanicButton({ className = "", compact = false }) {
   const [open, setOpen] = useState(false);
   const mut = useMutation({
     mutationFn: createPanicPlan,
@@ -63,18 +63,22 @@ export default function PanicButton({ className = "" }) {
   const plan = mut.data;
   const shareUrl = plan ? `${window.location.origin}/share/panic/${plan.share_token}` : "";
 
+  const btnClass = compact
+    ? `flex w-full items-center gap-3 rounded-lg py-2 pl-4 pr-3 text-[0.85rem] font-medium text-text-muted transition hover:bg-accent-red/10 hover:text-accent-red disabled:opacity-60 ${className}`
+    : `flex items-center justify-center gap-2 rounded-2xl bg-accent-red px-6 py-4 font-display text-lg text-white shadow-lg transition hover:brightness-110 disabled:opacity-70 ${className}`;
+
   return (
     <>
       <button
         onClick={() => mut.mutate()}
         disabled={mut.isPending}
-        style={{ animation: mut.isPending ? "none" : "panic-pulse 2.4s infinite" }}
-        className={`flex items-center justify-center gap-2 rounded-2xl bg-accent-red px-6 py-4 font-display text-lg text-white shadow-lg transition hover:brightness-110 disabled:opacity-70 ${className}`}
+        style={compact ? undefined : { animation: mut.isPending ? "none" : "panic-pulse 2.4s infinite" }}
+        className={btnClass}
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-5 w-5">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={compact ? 1.5 : 2} className="h-5 w-5">
           <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
-        {mut.isPending ? "Building your plan…" : "Panic Mode"}
+        {mut.isPending ? "Building plan…" : "Panic Mode"}
       </button>
 
       <AnimatePresence>

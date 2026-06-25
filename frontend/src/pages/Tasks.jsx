@@ -5,7 +5,7 @@ import { SortableContext, verticalListSortingStrategy, useSortable, arrayMove } 
 import { CSS } from "@dnd-kit/utilities";
 import { AnimatePresence, motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { fetchTasks, createTask, updateTask, deleteTask, markTaskDone, importFromGmail, aiPrioritize } from "../lib/queries";
+import { fetchTasks, createTask, updateTask, deleteTask, markTaskDone, importFromGmail, aiPrioritize, breakdownTask } from "../lib/queries";
 import Confetti from "../components/Confetti";
 import ProcrastinationAlert from "../components/ProcrastinationAlert";
 import { CardSkeleton } from "../components/Skeleton";
@@ -67,64 +67,151 @@ function countdown(deadline) {
 /* ------------------------------------------------------------------ */
 
 function SortableTaskCard({ task, onDone, onDelete }) {
+  const qc = useQueryClient();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   const done = task.status === "done";
-  const [burst, setBurst] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+  const [breakdown, setBreakdown] = useState(null);
+  const [loadingBreakdown, setLoadingBreakdown] = useState(false);
 
   const urgency = urgencyOf(task);
 
-  const handleDone = () => {
-    if (done) return;
-    setBurst(true);
-    setTimeout(() => setBurst(false), 900);
-    onDone(task.id);
+  const handleDone = (e) => {
+    e.stopPropagation();
+    if (done) {
+      updateTask(task.id, { status: "pending" }).then(() => qc.invalidateQueries({ queryKey: ["tasks"] }));
+    } else {
+      onDone(task.id);
+    }
+  };
+
+  const handleExpand = () => {
+    if (!expanded && !breakdown && !loadingBreakdown) {
+      setLoadingBreakdown(true);
+      breakdownTask(task.id)
+        .then((d) => setBreakdown(d))
+        .catch(() => setBreakdown({ summary: "Could not generate breakdown.", subtasks: [] }))
+        .finally(() => setLoadingBreakdown(false));
+    }
+    setExpanded(!expanded);
+  };
+
+  const toggleSubtask = (subId, currentStatus) => {
+    const next = currentStatus === "done" ? "pending" : "done";
+    updateTask(subId, { status: next }).then(() => {
+      setBreakdown((prev) => prev && ({
+        ...prev,
+        subtasks: prev.subtasks.map((s) => s.id === subId ? { ...s, status: next } : s),
+      }));
+      qc.invalidateQueries({ queryKey: ["tasks"] });
+    });
   };
 
   return (
     <motion.div ref={setNodeRef} style={style} layout initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -100 }}
-      className={`group relative flex items-start gap-3 rounded-xl border border-l-4 ${URGENCY_BORDER[urgency]} border-border bg-bg-surface p-4 transition hover:bg-bg-elevated/60 ${done ? "opacity-60" : ""}`}>
+      className={`group rounded-xl border border-l-4 ${URGENCY_BORDER[urgency]} border-border bg-bg-surface transition ${done ? "opacity-60" : ""}`}>
 
-      {/* Confetti on completion */}
-      <AnimatePresence>{burst && <Confetti />}</AnimatePresence>
-
-      {/* Drag handle */}
-      <div {...attributes} {...listeners} className="mt-1 cursor-grab text-text-muted/40 hover:text-text-muted touch-none">
-        <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-          <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
-          <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
-          <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
-        </svg>
-      </div>
-
-      {/* Check button */}
-      <button onClick={handleDone} disabled={done}
-        className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ${done ? "border-accent-green bg-accent-green" : "border-border hover:border-accent-green"}`}>
-        {done && <svg viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth={3} className="h-3 w-3"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-      </button>
-
-      {/* Content */}
-      <div className="flex-1 min-w-0">
-        <p className={`text-sm font-medium text-text-primary ${done ? "line-through text-text-muted" : ""}`}>{task.title}</p>
-        <div className="mt-1 flex flex-wrap items-center gap-2">
-          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${PRI_COLORS[task.priority] || PRI_COLORS.medium}`}>
-            {task.priority === "high" ? "urgent" : task.priority}
-          </span>
-          {task.deadline && <span className={`font-mono text-[11px] ${URGENCY_TEXT[urgency]}`}>{countdown(task.deadline)}</span>}
-          {task.source !== "manual" && SOURCE_TAGS[task.source] && (
-            <span className="rounded-full bg-bg-elevated px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-text-muted">{SOURCE_TAGS[task.source]}</span>
-          )}
+      <div className="flex items-start gap-3 p-4 cursor-pointer" onClick={handleExpand}>
+        {/* Drag handle */}
+        <div {...attributes} {...listeners} onClick={(e) => e.stopPropagation()} className="mt-1 cursor-grab text-text-muted/40 hover:text-text-muted touch-none">
+          <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+            <circle cx="9" cy="6" r="1.5" /><circle cx="15" cy="6" r="1.5" />
+            <circle cx="9" cy="12" r="1.5" /><circle cx="15" cy="12" r="1.5" />
+            <circle cx="9" cy="18" r="1.5" /><circle cx="15" cy="18" r="1.5" />
+          </svg>
         </div>
+
+        {/* Check/uncheck button */}
+        <button onClick={handleDone}
+          className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 transition ${done ? "border-accent bg-accent" : "border-border hover:border-accent"}`}>
+          {done && <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3} className="h-3 w-3 text-text-onaccent"><path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+        </button>
+
+        {/* Content */}
+        <div className="flex-1 min-w-0">
+          <p className={`text-sm font-medium text-text-primary ${done ? "line-through text-text-muted" : ""}`}>{task.title}</p>
+          <div className="mt-1 flex flex-wrap items-center gap-2">
+            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${PRI_COLORS[task.priority] || PRI_COLORS.medium}`}>
+              {task.priority}
+            </span>
+            {task.deadline && <span className={`font-mono text-[11px] ${URGENCY_TEXT[urgency]}`}>{countdown(task.deadline)}</span>}
+            {task.source !== "manual" && SOURCE_TAGS[task.source] && (
+              <span className="rounded-full bg-bg-elevated px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-text-muted">{SOURCE_TAGS[task.source]}</span>
+            )}
+          </div>
+        </div>
+
+        {/* Expand arrow */}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}
+          className={`h-4 w-4 shrink-0 text-text-muted transition-transform duration-200 ${expanded ? "rotate-180" : ""}`}>
+          <path d="M19 9l-7 7-7-7" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+
+        {/* Delete */}
+        <button onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
+          className="mt-1 text-text-muted/40 opacity-0 group-hover:opacity-100 hover:text-accent-red transition">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
+            <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
       </div>
 
-      {/* Delete */}
-      <button onClick={() => onDelete(task.id)}
-        className="mt-1 text-text-muted/40 opacity-0 group-hover:opacity-100 hover:text-accent-red transition">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4">
-          <path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      </button>
+      {/* Expanded: AI summary + subtasks */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden border-t border-border"
+          >
+            <div className="space-y-3 px-4 py-4 pl-12">
+              {loadingBreakdown && (
+                <p className="text-xs text-text-muted animate-pulse">AI is breaking this down...</p>
+              )}
+
+              {breakdown && (
+                <>
+                  {/* AI summary */}
+                  <div className="flex items-start gap-2 rounded-lg border-l-2 border-accent bg-accent/5 p-3">
+                    <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-accent">AI</span>
+                    <p className="text-sm leading-relaxed text-text-muted">{breakdown.summary}</p>
+                  </div>
+
+                  {/* Subtasks */}
+                  {breakdown.subtasks.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-semibold uppercase tracking-wider text-text-muted">Subtasks</p>
+                      {breakdown.subtasks.map((sub) => {
+                        const subDone = sub.status === "done";
+                        return (
+                          <div key={sub.id} className="flex items-start gap-3 rounded-lg bg-bg-elevated/50 px-3 py-2.5">
+                            <button onClick={() => toggleSubtask(sub.id, sub.status)}
+                              className={`mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded border transition ${subDone ? "border-accent bg-accent" : "border-border hover:border-accent"}`}>
+                              {subDone && (
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3.5} className="h-2.5 w-2.5 text-text-onaccent">
+                                  <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                              )}
+                            </button>
+                            <div className="min-w-0 flex-1">
+                              <p className={`text-sm ${subDone ? "line-through text-text-muted" : "text-text-primary"}`}>{sub.title}</p>
+                              {sub.description && <p className="mt-0.5 text-xs text-text-muted">{sub.description}</p>}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

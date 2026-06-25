@@ -681,3 +681,121 @@ async def break_into_chunks(
         created.append(sub.title)
     await db.flush()
     return ChunkResponse(created=created)
+
+
+# ---------------------------------------------------------------------------
+# AI Breakdown — expand a task into subtasks with descriptions
+# ---------------------------------------------------------------------------
+
+_BREAKDOWN_SYSTEM = (
+    "Break this task into 3-6 concrete subtasks. For each subtask give a short "
+    "title (max 80 chars) and a one-sentence description of how to do it.\n\n"
+    "Also provide a one-sentence summary of the overall approach.\n\n"
+    'Return strict JSON: {"summary": "...", "subtasks": [{"title": "...", "description": "..."}]}'
+)
+
+
+class SubtaskOut(BaseModel):
+    id: str
+    title: str
+    description: str | None
+    status: str
+
+
+class BreakdownResponse(BaseModel):
+    summary: str
+    subtasks: list[SubtaskOut]
+
+
+@router.post("/{task_id}/breakdown", response_model=BreakdownResponse)
+async def ai_breakdown(
+    task_id: str,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> BreakdownResponse:
+    task = (
+        await db.execute(
+            select(Task).where(and_(Task.id == uuid.UUID(task_id), Task.user_id == user.id))
+        )
+    ).scalar_one_or_none()
+    if task is None:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    # Check for existing subtasks first.
+    existing = (
+        await db.execute(
+            select(Task).where(and_(Task.parent_task_id == task.id, Task.user_id == user.id))
+            .order_by(Task.created_at)
+        )
+    ).scalars().all()
+
+    if existing:
+        return BreakdownResponse(
+            summary=task.description or f"Subtasks for: {task.title}",
+            subtasks=[SubtaskOut(id=str(s.id), title=s.title, description=s.description, status=s.status) for s in existing],
+        )
+
+    prompt = f"Task: {task.title}"
+    if task.description:
+        prompt += f"\nContext: {task.description}"
+    if task.deadline:
+        prompt += f"\nDeadline: {task.deadline.isoformat()}"
+
+    try:
+        completion = await openai_client.chat.completions.create(
+            model=LLM_MODEL,
+            response_format={"type": "json_object"},
+            temperature=0.4,
+            messages=[
+                {"role": "system", "content": _BREAKDOWN_SYSTEM},
+                {"role": "user", "content": prompt},
+            ],
+        )
+        raw = completion.choices[0].message.content or "{}"
+        data = json.loads(raw)
+    except Exception:
+        data = {"summary": f"Break down: {task.title}", "subtasks": []}
+
+    summary = str(data.get("summary", ""))
+    subtasks_out: list[SubtaskOut] = []
+
+    for item in data.get("subtasks", [])[:8]:
+        title = str(item.get("title", "")).strip()[:80]
+        desc = str(item.get("description", "")).strip()[:500]
+        if not title:
+            continue
+        sub = Task(
+            user_id=user.id,
+            title=title,
+            description=desc,
+            deadline=task.deadline,
+            priority=task.priority,
+            status="pending",
+            source="manual",
+            parent_task_id=task.id,
+        )
+        db.add(sub)
+        await db.flush()
+        await db.refresh(sub)
+        subtasks_out.append(SubtaskOut(id=str(sub.id), title=sub.title, description=sub.description, status=sub.status))
+
+    if summary and not task.description:
+        task.description = summary
+        await db.flush()
+
+    return BreakdownResponse(summary=summary, subtasks=subtasks_out)
+
+
+@router.get("/{task_id}/subtasks")
+async def get_subtasks(
+    task_id: str,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> list[SubtaskOut]:
+    subs = (
+        await db.execute(
+            select(Task).where(and_(Task.parent_task_id == uuid.UUID(task_id), Task.user_id == user.id))
+            .order_by(Task.created_at)
+        )
+    ).scalars().all()
+    return [SubtaskOut(id=str(s.id), title=s.title, description=s.description, status=s.status) for s in subs]

@@ -86,29 +86,16 @@ const fadeUp = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, 
 /* ------------------------------------------------------------------ */
 
 function TopBar({ onSync, syncing }) {
-  const user = useUserStore((s) => s.user);
-  const [imgFailed, setImgFailed] = useState(false);
-  const initial = (user?.name || user?.email || "?").trim().charAt(0).toUpperCase() || "?";
-  const showPicture = user?.picture_url && !imgFailed;
   return (
     <header className="flex items-center justify-between border-b border-border bg-bg-surface/60 px-6 py-3 backdrop-blur-sm">
       <h1 className="font-display text-lg font-bold tracking-tight">Producty</h1>
-      <div className="flex items-center gap-3">
-        <button onClick={onSync} disabled={syncing}
-          className="flex items-center gap-1.5 rounded-lg bg-accent-blue/10 px-3 py-1.5 text-xs font-medium text-accent-blue transition hover:bg-accent-blue/20 disabled:opacity-50">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`}>
-            <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m0 0a9 9 0 0 1 9-9m-9 9a9 9 0 0 0 9 9" />
-          </svg>
-          {syncing ? "Syncing…" : "Sync Google"}
-        </button>
-        {showPicture ? (
-          <img src={user.picture_url} alt={user?.name || "Profile"} referrerPolicy="no-referrer"
-            onError={() => setImgFailed(true)}
-            className="h-8 w-8 rounded-full object-cover" />
-        ) : (
-          <div className="h-8 w-8 rounded-full bg-accent-purple/20 flex items-center justify-center text-xs font-bold text-accent-purple">{initial}</div>
-        )}
-      </div>
+      <button onClick={onSync} disabled={syncing}
+        className="flex items-center gap-1.5 rounded-lg bg-accent/10 px-3 py-1.5 text-xs font-medium text-accent transition hover:bg-accent/20 disabled:opacity-50">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className={`h-3.5 w-3.5 ${syncing ? "animate-spin" : ""}`}>
+          <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m0 0a9 9 0 0 1 9-9m-9 9a9 9 0 0 0 9 9" />
+        </svg>
+        {syncing ? "Syncing…" : "Sync Google"}
+      </button>
     </header>
   );
 }
@@ -354,15 +341,7 @@ export default function Dashboard() {
               <p className="mt-1 text-sm text-text-muted">{today}</p>
             </motion.div>
 
-            {/* The app's thesis in one button. */}
-            <motion.div {...fadeUp}>
-              <PanicButton className="w-full" />
-              <p className="mt-2 text-center text-[11px] text-text-muted">Overwhelmed? Get a 48-hour survival plan instantly.</p>
-            </motion.div>
-
             <MoodCheckin />
-
-            <DailyPlanWidget data={plan.data} isLoading={plan.isLoading} />
           </div>
 
           {/* -------- CENTER COLUMN -------- */}
