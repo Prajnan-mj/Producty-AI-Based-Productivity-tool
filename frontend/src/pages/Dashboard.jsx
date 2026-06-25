@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useUserStore from "../store/userStore";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
@@ -87,7 +87,9 @@ const fadeUp = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, 
 
 function TopBar({ onSync, syncing }) {
   const user = useUserStore((s) => s.user);
-  const initial = (user?.name || user?.email || "?").trim().charAt(0).toUpperCase();
+  const [imgFailed, setImgFailed] = useState(false);
+  const initial = (user?.name || user?.email || "?").trim().charAt(0).toUpperCase() || "?";
+  const showPicture = user?.picture_url && !imgFailed;
   return (
     <header className="flex items-center justify-between border-b border-border bg-bg-surface/60 px-6 py-3 backdrop-blur-sm">
       <h1 className="font-display text-lg font-bold tracking-tight">Producty</h1>
@@ -99,8 +101,9 @@ function TopBar({ onSync, syncing }) {
           </svg>
           {syncing ? "Syncing…" : "Sync Google"}
         </button>
-        {user?.picture_url ? (
+        {showPicture ? (
           <img src={user.picture_url} alt={user?.name || "Profile"} referrerPolicy="no-referrer"
+            onError={() => setImgFailed(true)}
             className="h-8 w-8 rounded-full object-cover" />
         ) : (
           <div className="h-8 w-8 rounded-full bg-accent-purple/20 flex items-center justify-center text-xs font-bold text-accent-purple">{initial}</div>

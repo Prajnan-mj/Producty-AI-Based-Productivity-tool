@@ -21,7 +21,11 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(undefined, (error) => {
   if (error.response?.status === 401) {
     localStorage.removeItem("token");
-    window.location.href = "/login";
+    localStorage.removeItem("user");
+    // Avoid a redirect loop if we're already on a public page.
+    if (!/\/(login|privacy|terms)$|^\/$/.test(window.location.pathname)) {
+      window.location.href = "/login";
+    }
   }
   return Promise.reject(error);
 });
