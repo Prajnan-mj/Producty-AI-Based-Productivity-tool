@@ -15,7 +15,7 @@
  * @param {AbortSignal} [opts.signal]     Optional abort signal.
  */
 export async function streamChat({ message, contextWindow = [], onToken, onDone, onError, signal }) {
-  const base = import.meta.env.VITE_API_URL || "/api";
+  const base = import.meta.env.VITE_API_URL || window.__PRODUCTY_CONFIG__?.API_URL || "/api";
   const token = localStorage.getItem("token");
 
   try {

@@ -42,8 +42,11 @@ services:
     dockerContext: ./frontend
     plan: free
     envVars:
+      # Runtime env var — injected into config.js when the container starts.
+      # Set to the backend's public URL + /api, e.g.:
+      #   https://producty-api.onrender.com/api
       - key: API_URL
-        sync: false  # set to https://producty-api.onrender.com after deploy
+        sync: false
 
 # ── Managed PostgreSQL ───────────────────────────────────────────────
 databases:

@@ -1,7 +1,13 @@
 import axios from "axios";
 
+function getApiBase() {
+  if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+  if (window.__PRODUCTY_CONFIG__?.API_URL) return window.__PRODUCTY_CONFIG__.API_URL;
+  return "/api";
+}
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "/api",
+  baseURL: getApiBase(),
 });
 
 api.interceptors.request.use((config) => {
