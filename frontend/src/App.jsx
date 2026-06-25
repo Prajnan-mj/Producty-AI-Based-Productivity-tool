@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet, Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import Lenis from "lenis";
 import useUiStore from "./store/uiStore";
@@ -109,6 +109,13 @@ function Sidebar() {
             </svg>
             Sign Out
           </button>
+
+          {/* Legal links */}
+          <div className="mt-2 flex items-center gap-2 px-3 text-[10px] text-white/30">
+            <Link to="/privacy" className="transition hover:text-white/60">Privacy</Link>
+            <span>·</span>
+            <Link to="/terms" className="transition hover:text-white/60">Terms</Link>
+          </div>
         </div>
       </aside>
     </>
