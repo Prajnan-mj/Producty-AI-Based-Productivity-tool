@@ -144,3 +144,28 @@ app.include_router(infra.router, prefix="/api/infra", tags=["infra"])
 @app.get("/health")
 async def health_check() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/debug/config")
+async def debug_config() -> dict[str, object]:
+    """Temporary debug endpoint — shows masked config to diagnose deploy issues."""
+    def mask(val: str) -> str:
+        if not val:
+            return "(empty)"
+        if len(val) <= 8:
+            return val[:2] + "***"
+        return val[:6] + "***" + val[-4:]
+
+    return {
+        "GOOGLE_CLIENT_ID": mask(settings.GOOGLE_CLIENT_ID),
+        "GOOGLE_CLIENT_SECRET": mask(settings.GOOGLE_CLIENT_SECRET),
+        "GOOGLE_REDIRECT_URI": settings.GOOGLE_REDIRECT_URI,
+        "FRONTEND_URL": settings.FRONTEND_URL,
+        "CORS_ALLOW_ORIGINS": settings.CORS_ALLOW_ORIGINS,
+        "cors_origins_resolved": settings.cors_origins,
+        "DEBUG": settings.DEBUG,
+        "LLM_PROVIDER": settings.LLM_PROVIDER,
+        "NVIDIA_API_KEY": mask(settings.NVIDIA_API_KEY),
+        "DATABASE_URL": mask(settings.async_database_url),
+        "REDIS_URL": mask(settings.REDIS_URL) if settings.REDIS_URL else "(empty)",
+    }
