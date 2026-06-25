@@ -34,42 +34,14 @@ function CountUp({ to, suffix = "" }) {
   return <span ref={ref} className="tabular-nums">{Math.round(val)}{suffix}</span>;
 }
 
-/* A full-bleed image background section with a readable overlay. */
-function BgSection({ src, children, className = "", overlay = "bg-bg-base/75" }) {
-  return (
-    <section
-      className={`relative bg-cover bg-center bg-no-repeat ${className}`}
-      style={{ backgroundImage: `url(${src})` }}
-    >
-      <div className={`absolute inset-0 ${overlay} backdrop-blur-[2px]`} />
-      <div className="relative">{children}</div>
-    </section>
-  );
-}
-
 /* ------------------------------------------------------------------ */
-/* Content                                                             */
+/* Content data                                                        */
 /* ------------------------------------------------------------------ */
 
-const STORY = [
-  {
-    tag: "Capture & Plan",
-    title: "Paste the chaos. Get a plan.",
-    body: "Drop an email, a screenshot, or a brain-dump. Producty's AI pulls out every task and deadline, then lays your day out from morning to evening.",
-    img: "/art-working-desk.webp",
-  },
-  {
-    tag: "Learn & Grow",
-    title: "Turn effort into momentum.",
-    body: "Habits, goals, flashcards, and a Notion-style notebook — all in one place. Track streaks, hit milestones, and let the AI help you study and write.",
-    img: "/art-knowledge-tree.webp",
-  },
-  {
-    tag: "Connect & Act",
-    title: "Your calendar and inbox, handled.",
-    body: "Google Calendar and Gmail flow in automatically. Actionable emails become tasks, and the AI drafts and sends replies on your behalf.",
-    img: "/art-network.webp",
-  },
+const STEPS = [
+  { n: "01", title: "Capture", body: "Paste an email, a screenshot, or a brain-dump. The AI pulls out every task and deadline and files it where it belongs." },
+  { n: "02", title: "Plan", body: "Tasks, meetings, and deadlines flow into one calm view, ranked by what actually matters today." },
+  { n: "03", title: "Act", body: "Ask the AI to draft an email, break down a project, or rescue you with a 48-hour survival plan." },
 ];
 
 const FEATURES = [
@@ -111,7 +83,7 @@ export default function Landing() {
       <motion.div style={{ scaleX: progress }} className="fixed inset-x-0 top-0 z-50 h-0.5 origin-left bg-accent" />
 
       {/* Nav */}
-      <header className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 ${scrolled ? "border-b border-border bg-bg-base/85 backdrop-blur-md" : "bg-transparent"}`}>
+      <header className={`fixed inset-x-0 top-0 z-40 transition-colors duration-300 ${scrolled ? "border-b border-border bg-bg-base/90 backdrop-blur-md" : "bg-transparent"}`}>
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <span className="font-display text-xl font-extrabold tracking-tight">Producty</span>
           <nav className="hidden items-center gap-8 text-sm text-text-muted md:flex">
@@ -127,13 +99,25 @@ export default function Landing() {
       </header>
 
       {/* ============================================================ */}
-      {/* HERO — art-hero-banner as full background                    */}
+      {/* HERO — single full-viewport image background                 */}
+      {/* Uses the branded "Producty Working and Learning" banner.      */}
+      {/* A strong overlay + backdrop-blur keeps all text legible.      */}
       {/* ============================================================ */}
-      <BgSection src="/art-hero-banner.webp" overlay="bg-bg-base/70" className="min-h-dvh">
-        <div className="mx-auto flex min-h-dvh max-w-6xl flex-col items-center justify-center px-6 text-center">
+      <section className="relative min-h-dvh overflow-hidden">
+        {/* Background image — covers entire hero, fixed-position feel */}
+        <img
+          src="/art-hero-banner.webp"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover object-center"
+        />
+        {/* Gradient overlay: heavier at top (for nav+text) fading to lighter at bottom (image peeks through) */}
+        <div className="absolute inset-0 bg-gradient-to-b from-bg-base/90 via-bg-base/75 to-bg-base/60" />
+
+        <div className="relative mx-auto flex min-h-dvh max-w-6xl flex-col items-center justify-center px-6 text-center">
           <motion.span
             initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease: EASE }}
-            className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/8 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent">
+            className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-bg-surface/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-accent backdrop-blur-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" /> AI-powered productivity
           </motion.span>
 
@@ -145,7 +129,7 @@ export default function Landing() {
 
           <motion.p
             initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease: EASE, delay: 0.18 }}
-            className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-text-muted">
+            className="mx-auto mt-6 max-w-xl rounded-xl bg-bg-surface/60 px-5 py-3 text-lg leading-relaxed text-text-primary backdrop-blur-sm">
             Producty turns scattered tasks, emails, and deadlines into one calm plan — with an
             AI assistant that drafts your emails, breaks down your work, and rescues you when it piles up.
           </motion.p>
@@ -160,91 +144,116 @@ export default function Landing() {
                 <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
-            <a href="#how" className="rounded-xl border border-border bg-bg-base/50 px-7 py-3.5 text-sm font-semibold text-text-primary backdrop-blur-sm transition hover:bg-bg-base/80">
+            <a href="#how" className="rounded-xl border border-border bg-bg-surface/70 px-7 py-3.5 text-sm font-semibold text-text-primary backdrop-blur-sm transition hover:bg-bg-surface">
               See how it works
             </a>
           </motion.div>
         </div>
-      </BgSection>
+      </section>
 
       {/* ============================================================ */}
-      {/* HOW IT WORKS — each step uses its sketch as background       */}
+      {/* HOW IT WORKS — clean cards on plain background               */}
       {/* ============================================================ */}
-      <div id="how" className="bg-bg-base">
-        <Reveal className="px-6 pt-24 pb-8 text-center">
+      <section id="how" className="mx-auto max-w-6xl px-6 py-24">
+        <Reveal className="text-center">
           <span className="text-xs font-semibold uppercase tracking-wider text-accent">How it works</span>
           <h2 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">From mess to momentum.</h2>
         </Reveal>
-
-        {STORY.map((s, i) => (
-          <BgSection key={s.tag} src={s.img} overlay="bg-bg-base/80">
-            <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
-              <Reveal>
-                <div className={`flex flex-col items-start gap-3 ${i % 2 === 1 ? "md:items-end md:text-right" : ""}`}>
-                  <span className="inline-block rounded-full border border-accent/30 bg-accent/8 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-accent backdrop-blur-sm">
-                    {s.tag}
-                  </span>
-                  <h3 className="max-w-lg font-display text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">
-                    {s.title}
-                  </h3>
-                  <p className="max-w-md text-base leading-relaxed text-text-muted">{s.body}</p>
-                </div>
-              </Reveal>
-            </div>
-          </BgSection>
-        ))}
-      </div>
-
-      {/* ============================================================ */}
-      {/* STATS                                                        */}
-      {/* ============================================================ */}
-      <section className="border-y border-border bg-bg-surface">
-        <div className="mx-auto grid max-w-5xl grid-cols-2 gap-8 px-6 py-16 text-center md:grid-cols-4">
-          {STATS.map((s, i) => (
-            <Reveal key={s.label} delay={i * 0.07}>
-              <p className="font-display text-4xl font-extrabold text-accent sm:text-5xl">
-                {s.zero ? "0" : <CountUp to={s.to} suffix={s.suffix} />}
-              </p>
-              <p className="mt-2 text-sm text-text-muted">{s.label}</p>
+        <div className="mt-14 grid gap-6 md:grid-cols-3">
+          {STEPS.map((s, i) => (
+            <Reveal key={s.n} delay={i * 0.08}>
+              <div className="h-full rounded-2xl border border-border bg-bg-surface p-7 shadow-[0_2px_20px_-12px_rgba(27,26,23,0.15)]">
+                <p className="font-display text-3xl font-extrabold text-accent/30">{s.n}</p>
+                <h3 className="mt-4 font-display text-xl font-bold">{s.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-text-muted">{s.body}</p>
+              </div>
             </Reveal>
           ))}
         </div>
       </section>
 
       {/* ============================================================ */}
-      {/* FEATURES — icons sketch as background                        */}
+      {/* STATS — inside a single image-backed box                     */}
+      {/* Uses the knowledge-tree art, blended properly inside a card  */}
       {/* ============================================================ */}
-      <BgSection src="/art-icons.webp" overlay="bg-bg-base/85" className="py-24" id="features">
-        <div className="mx-auto max-w-6xl px-6">
-          <Reveal className="mb-12 text-center">
-            <span className="text-xs font-semibold uppercase tracking-wider text-accent">Everything you need</span>
-            <h2 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">One app. Your whole workflow.</h2>
-            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-text-muted">
-              No more juggling six tools. Tasks, calendar, notes, habits, and an AI assistant — together, and free.
-            </p>
-          </Reveal>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-            {FEATURES.map((f, i) => (
-              <Reveal key={f.title} delay={i * 0.05} className={f.span || ""}>
-                <div className="group h-full rounded-2xl border border-border bg-bg-surface/90 p-6 backdrop-blur-sm transition-shadow hover:shadow-[0_12px_40px_-16px_rgba(27,26,23,0.25)]">
-                  <div className="mb-4 grid h-9 w-9 place-items-center rounded-lg bg-accent/12">
-                    <span className="h-2 w-2 rounded-full bg-accent" />
-                  </div>
-                  <h3 className="font-display text-lg font-bold">{f.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-text-muted">{f.body}</p>
-                </div>
-              </Reveal>
-            ))}
+      <section className="mx-auto max-w-6xl px-6 pb-20">
+        <Reveal>
+          <div className="relative overflow-hidden rounded-3xl border border-border">
+            {/* Background image — fills this box only */}
+            <img
+              src="/art-knowledge-tree.webp"
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-bg-base/80 backdrop-blur-[3px]" />
+
+            <div className="relative grid grid-cols-2 gap-8 px-8 py-16 text-center md:grid-cols-4">
+              {STATS.map((s, i) => (
+                <Reveal key={s.label} delay={i * 0.07}>
+                  <p className="font-display text-4xl font-extrabold text-accent sm:text-5xl">
+                    {s.zero ? "0" : <CountUp to={s.to} suffix={s.suffix} />}
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-text-primary">{s.label}</p>
+                </Reveal>
+              ))}
+            </div>
           </div>
+        </Reveal>
+      </section>
+
+      {/* ============================================================ */}
+      {/* FEATURES — bento grid on plain bg, one image card blended in */}
+      {/* ============================================================ */}
+      <section id="features" className="mx-auto max-w-6xl px-6 py-24">
+        <Reveal className="mb-12 text-center">
+          <span className="text-xs font-semibold uppercase tracking-wider text-accent">Everything you need</span>
+          <h2 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">One app. Your whole workflow.</h2>
+          <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-text-muted">
+            No more juggling six tools. Tasks, calendar, notes, habits, and an AI assistant — together, and free.
+          </p>
+        </Reveal>
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          {FEATURES.map((f, i) => (
+            <Reveal key={f.title} delay={i * 0.05} className={f.span || ""}>
+              <div className="group h-full rounded-2xl border border-border bg-bg-surface p-6 transition-shadow hover:shadow-[0_12px_40px_-16px_rgba(27,26,23,0.2)]">
+                <div className="mb-4 grid h-9 w-9 place-items-center rounded-lg bg-accent/12">
+                  <span className="h-2 w-2 rounded-full bg-accent" />
+                </div>
+                <h3 className="font-display text-lg font-bold">{f.title}</h3>
+                <p className="mt-1.5 text-sm leading-relaxed text-text-muted">{f.body}</p>
+              </div>
+            </Reveal>
+          ))}
+
+          {/* Blended image card as the final grid item */}
+          <Reveal delay={0.3} className="md:col-span-3">
+            <div className="relative overflow-hidden rounded-2xl border border-border" style={{ minHeight: 220 }}>
+              <img
+                src="/art-network.webp"
+                alt="Connected productivity"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-r from-bg-base/90 via-bg-base/70 to-bg-base/40" />
+              <div className="relative flex h-full items-center px-8 py-10">
+                <div className="max-w-md">
+                  <h3 className="font-display text-2xl font-extrabold sm:text-3xl">Everything connected.</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-text-muted">
+                    Tasks feed your calendar. Emails become tasks. Notes link to goals. The AI sees it all — so you don't have to.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
-      </BgSection>
+      </section>
 
       {/* ============================================================ */}
       {/* CTA                                                          */}
       {/* ============================================================ */}
-      <section className="mx-auto max-w-6xl px-6 py-28">
+      <section className="mx-auto max-w-6xl px-6 pb-28">
         <Reveal>
-          <div className="relative overflow-hidden rounded-3xl border border-accent/20 bg-bg-surface px-8 py-16 text-center shadow-[0_30px_80px_-30px_rgba(27,26,23,0.3)] md:py-20">
+          <div className="relative overflow-hidden rounded-3xl border border-accent/20 bg-bg-surface px-8 py-16 text-center shadow-[0_30px_80px_-30px_rgba(27,26,23,0.25)] md:py-20">
             <div className="pointer-events-none absolute left-1/2 top-0 h-64 w-64 -translate-x-1/2 rounded-full bg-accent/15 blur-[100px]" aria-hidden />
             <h2 className="relative font-display text-4xl font-extrabold tracking-tight sm:text-5xl">Get your time back.</h2>
             <p className="relative mx-auto mt-4 max-w-md text-base text-text-muted">
