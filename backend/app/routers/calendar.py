@@ -162,6 +162,74 @@ class SyncSummary(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# 0. GET /debug — diagnose why calendar/gmail isn't syncing
+# ---------------------------------------------------------------------------
+
+@router.get("/debug")
+async def calendar_debug(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, Any]:
+    """Surfaces the real error behind a failing calendar read."""
+    out: dict[str, Any] = {
+        "has_access_token": bool(user.google_access_token),
+        "has_refresh_token": bool(user.google_refresh_token),
+        "token_expiry": user.google_token_expiry.isoformat() if user.google_token_expiry else None,
+    }
+
+    if not user.google_access_token:
+        out["error"] = "No Google token stored. Sign out and sign in again."
+        return out
+
+    # Check which scopes the token actually has (via Google's tokeninfo).
+    try:
+        import httpx
+        async with httpx.AsyncClient() as client:
+            resp = await client.get(
+                "https://www.googleapis.com/oauth2/v1/tokeninfo",
+                params={"access_token": user.google_access_token},
+            )
+        if resp.status_code == 200:
+            info = resp.json()
+            out["granted_scopes"] = info.get("scope", "")
+            out["has_calendar_scope"] = "calendar" in info.get("scope", "")
+        else:
+            out["tokeninfo_status"] = resp.status_code
+    except Exception as exc:  # noqa: BLE001
+        out["tokeninfo_error"] = str(exc)
+
+    # Try an actual calendar read and report the real error.
+    try:
+        creds = _get_google_credentials(user)
+        await _persist_refreshed_token(creds, user, db)
+        service = _build_calendar_service(creds)
+        now = datetime.now(timezone.utc)
+        events_result = (
+            service.events()
+            .list(
+                calendarId="primary",
+                timeMin=now.isoformat(),
+                timeMax=(now + timedelta(days=30)).isoformat(),
+                singleEvents=True,
+                orderBy="startTime",
+                maxResults=10,
+            )
+            .execute()
+        )
+        events = events_result.get("items", [])
+        out["calendar_read_ok"] = True
+        out["events_found"] = len(events)
+        out["sample_events"] = [
+            {"title": e.get("summary"), "start": e.get("start")} for e in events[:5]
+        ]
+    except Exception as exc:  # noqa: BLE001
+        out["calendar_read_ok"] = False
+        out["calendar_error"] = f"{type(exc).__name__}: {exc}"
+
+    return out
+
+
+# ---------------------------------------------------------------------------
 # 1. GET /meetings
 # ---------------------------------------------------------------------------
 
