@@ -390,18 +390,18 @@ export default function Landing() {
         // The marketing page stays intentionally dark (dark landing → light app
         // is a deliberate premium pattern). Re-scope the design tokens locally so
         // every token-based class inside reverts to the dark editorial palette.
-        "--bg-base": "#171411",
-        "--bg-surface": "#211C18",
-        "--bg-elevated": "#2B251F",
-        "--text-primary": "#F4EFE6",
-        "--text-muted": "#A89E90",
-        "--text-onaccent": "#171411",
-        "--border": "rgba(244,239,230,0.08)",
-        "--accent": "#CB6038",
-        "--accent-blue": "#CB6038",
-        "--accent-purple": "#CB6038",
-        "--accent-amber": "#CB6038",
-        "--accent-green": "#CB6038",
+        "--bg-base": "#0e1217",
+        "--bg-surface": "#141a21",
+        "--bg-elevated": "#1b232c",
+        "--text-primary": "#e7eaed",
+        "--text-muted": "#8a929b",
+        "--text-onaccent": "#0e1217",
+        "--border": "#2a2f36",
+        "--accent": "#ffb000",
+        "--accent-blue": "#ffb000",
+        "--accent-purple": "#ffb000",
+        "--accent-amber": "#ffb000",
+        "--accent-green": "#ffb000",
       }}
     >
       {/* Scroll progress bar */}

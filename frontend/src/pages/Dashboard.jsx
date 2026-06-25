@@ -77,7 +77,7 @@ function tomorrowISO() {
   return d.toISOString();
 }
 
-const DONUT_COLORS = ["#B4522E", "#E4DCCE"];
+const DONUT_COLORS = ["#FFB000", "#2A2F36"];
 
 const fadeUp = { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.35 } };
 
@@ -118,24 +118,28 @@ function DailyPlanWidget({ data, isLoading }) {
   if (!data) return null;
 
   const sections = [
-    { title: "Morning", icon: "☀️", blocks: data.morning_blocks },
-    { title: "Afternoon", icon: "🌤️", blocks: data.afternoon_blocks },
-    { title: "Evening", icon: "🌙", blocks: data.evening_blocks },
+    { title: "Morning", code: "AM", blocks: data.morning_blocks },
+    { title: "Afternoon", code: "PM", blocks: data.afternoon_blocks },
+    { title: "Evening", code: "EVE", blocks: data.evening_blocks },
   ];
 
   return (
-    <div className="rounded-xl border border-border bg-bg-surface p-5 space-y-4">
-      <h3 className="font-display text-sm font-bold text-text-muted uppercase tracking-wider">Daily Plan</h3>
-      {sections.map(({ title, icon, blocks }) =>
+    <div className="border border-border bg-bg-surface p-5 space-y-4">
+      <h3 className="font-display text-sm font-bold text-text-muted">Daily Plan</h3>
+      {sections.map(({ title, code, blocks }) =>
         blocks?.length > 0 && (
-          <div key={title} className="space-y-2">
-            <p className="text-xs font-medium text-text-muted">{icon} {title}</p>
-            {blocks.map((b, i) => (
-              <div key={i} className="flex items-center gap-2 rounded-lg bg-bg-elevated/50 px-3 py-2">
-                <span className="font-mono text-[11px] text-accent-blue w-14 shrink-0">{fmtTime(b.time)}</span>
-                <span className="text-sm text-text-primary truncate">{b.activity}</span>
-              </div>
-            ))}
+          <div key={title} className="space-y-1">
+            <p className="flex items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-text-muted">
+              <span className="text-accent">{code}</span> {title}
+            </p>
+            <div className="divide-y divide-border border-y border-border">
+              {blocks.map((b, i) => (
+                <div key={i} className="flex items-center gap-3 px-1 py-2">
+                  <span className="font-mono text-[11px] text-accent w-14 shrink-0">{fmtTime(b.time)}</span>
+                  <span className="text-sm text-text-primary truncate">{b.activity}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )
       )}
@@ -166,8 +170,9 @@ function UrgencyFeed({ tasks, summary, isLoading, onDone, onSnooze }) {
       )}
 
       {items.length === 0 && (
-        <div className="rounded-xl border border-border bg-bg-surface p-8 text-center text-text-muted text-sm">
-          No urgent tasks — you're clear! 🎉
+        <div className="border border-border bg-bg-surface px-6 py-8 text-center">
+          <p className="font-mono text-xs uppercase tracking-[0.25em] text-text-muted">Nothing urgent</p>
+          <p className="mt-1.5 text-sm text-text-muted">Plan your next move.</p>
         </div>
       )}
 
@@ -235,7 +240,7 @@ function MeetingsWidget({ data, isLoading }) {
       <h3 className="font-display text-sm font-bold text-text-muted uppercase tracking-wider">Upcoming</h3>
       {meetings.map((m) => (
         <div key={m.id} className="flex items-center gap-3">
-          <div className="h-8 w-1 rounded-full" style={{ background: m.category === "professional" ? "#6F7D55" : "#8A7E6E" }} />
+          <div className="h-8 w-1 rounded-full" style={{ background: m.category === "professional" ? "#4D7C8A" : "#5A6470" }} />
           <div className="flex-1 min-w-0">
             <p className="text-sm text-text-primary truncate">{m.title}</p>
             <p className="font-mono text-[11px] text-text-muted">
@@ -280,12 +285,16 @@ function MomentumWidget() {
   const momQ = useQuery({ queryKey: ["momentum"], queryFn: fetchMomentum, retry: false });
   const m = momQ.data;
   if (!m) return null;
-  const trendIcon = { improving: "📈", steady: "➡️", slipping: "📉" }[m.recent_trend] || "➡️";
+  const trend = {
+    improving: { label: "▲ UP", cls: "text-accent" },
+    steady: { label: "— FLAT", cls: "text-text-muted" },
+    slipping: { label: "▼ DOWN", cls: "text-accent-red" },
+  }[m.recent_trend] || { label: "— FLAT", cls: "text-text-muted" };
   return (
-    <div className="rounded-xl border border-border bg-bg-surface p-5">
+    <div className="border border-border bg-bg-surface p-5">
       <div className="flex items-center justify-between">
-        <h3 className="font-display text-sm font-bold text-text-muted uppercase tracking-wider">Momentum</h3>
-        <span>{trendIcon}</span>
+        <h3 className="font-display text-sm font-bold text-text-muted">Momentum</h3>
+        <span className={`font-mono text-[11px] font-semibold tracking-wider ${trend.cls}`}>{trend.label}</span>
       </div>
       <div className="mt-2 flex items-end gap-2">
         <span className="font-mono text-3xl font-bold text-accent">{m.streak_pct}%</span>
@@ -299,9 +308,9 @@ function MomentumWidget() {
 function AiTip({ message }) {
   if (!message) return null;
   return (
-    <div className="rounded-xl border border-accent-purple/20 bg-accent-purple/5 p-4 flex items-start gap-3">
-      <span className="text-lg">✨</span>
-      <p className="text-sm text-text-muted italic leading-relaxed">{message}</p>
+    <div className="flex items-start gap-3 border-l-2 border-accent bg-accent/5 p-4">
+      <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-accent shrink-0 pt-0.5">AI</span>
+      <p className="text-sm text-text-muted leading-relaxed">{message}</p>
     </div>
   );
 }

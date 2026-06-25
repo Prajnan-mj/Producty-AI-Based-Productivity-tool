@@ -12,7 +12,7 @@ import { CardSkeleton } from "../components/Skeleton";
 
 const CATEGORIES = ["health", "learning", "work", "personal"];
 const GOAL_CATS = ["health", "career", "learning", "finance", "personal"];
-const COLORS = { health: "#B4522E", learning: "#6F7D55", work: "#C08A3E", personal: "#8A7E6E", career: "#6F7D55", finance: "#C08A3E" };
+const COLORS = { health: "#FFB000", learning: "#4D7C8A", work: "#B07A1E", personal: "#5A6470", career: "#4D7C8A", finance: "#B07A1E" };
 
 /* ------------------------------------------------------------------ */
 /*  Confetti burst                                                     */
@@ -22,7 +22,7 @@ function Confetti({ show }) {
   if (!show) return null;
   const particles = Array.from({ length: 12 }, (_, i) => ({
     id: i, x: (Math.random() - 0.5) * 120, y: -(30 + Math.random() * 60),
-    color: ["#B4522E", "#C08A3E", "#6F7D55", "#8A7E6E", "#C2334D"][i % 5],
+    color: ["#FFB000", "#B07A1E", "#4D7C8A", "#5A6470", "#FF4D4D"][i % 5],
   }));
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -66,7 +66,7 @@ function HabitCard({ habit, onComplete }) {
       <Confetti show={justCompleted} />
 
       <UrgencyRing percentage={Math.min(weekPct, 100)} size={64} strokeWidth={5}
-        color={habit.completed_today ? "#B4522E" : habit.color || COLORS[habit.category]} />
+        color={habit.completed_today ? "#FFB000" : habit.color || COLORS[habit.category]} />
 
       <span className="text-2xl">{habit.icon}</span>
       <p className="text-sm font-medium text-text-primary text-center">{habit.name}</p>
@@ -96,7 +96,7 @@ function HabitCard({ habit, onComplete }) {
 
 function CreateHabitModal({ open, onClose }) {
   const qc = useQueryClient();
-  const [form, setForm] = useState({ name: "", description: "", frequency: "daily", target_count_per_period: 1, category: "personal", color: "#B4522E", icon: "⭐" });
+  const [form, setForm] = useState({ name: "", description: "", frequency: "daily", target_count_per_period: 1, category: "personal", color: "#FFB000", icon: "⭐" });
 
   const mut = useMutation({
     mutationFn: createHabit,
@@ -174,7 +174,7 @@ function GoalCard({ goal }) {
   });
 
   const daysLeft = goal.days_remaining;
-  const trackColor = goal.on_track_status === "on_track" ? "#B4522E" : goal.on_track_status === "slightly_behind" ? "#C08A3E" : "#C2334D";
+  const trackColor = goal.on_track_status === "on_track" ? "#FFB000" : goal.on_track_status === "slightly_behind" ? "#B07A1E" : "#FF4D4D";
 
   const progressPoints = goal.milestones?.filter((m) => m.is_completed).length || 0;
   const sparkData = Array.from({ length: 7 }, (_, i) => ({
@@ -188,7 +188,7 @@ function GoalCard({ goal }) {
         <div>
           <p className="text-sm font-medium text-text-primary">{goal.title}</p>
           <div className="mt-1 flex items-center gap-2">
-            <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize" style={{ background: (COLORS[goal.category] || "#8A7E6E") + "18", color: COLORS[goal.category] || "#8A7E6E" }}>
+            <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold capitalize" style={{ background: (COLORS[goal.category] || "#5A6470") + "18", color: COLORS[goal.category] || "#5A6470" }}>
               {goal.category}
             </span>
             <span className="font-mono text-[11px]" style={{ color: trackColor }}>{daysLeft}d left</span>
@@ -196,7 +196,7 @@ function GoalCard({ goal }) {
         </div>
         <div className="w-20 h-8">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={sparkData}><Line type="monotone" dataKey="v" stroke="#8A7E6E" strokeWidth={1.5} dot={false} /></LineChart>
+            <LineChart data={sparkData}><Line type="monotone" dataKey="v" stroke="#5A6470" strokeWidth={1.5} dot={false} /></LineChart>
           </ResponsiveContainer>
         </div>
       </div>
@@ -210,7 +210,7 @@ function GoalCard({ goal }) {
         <div className="h-2.5 rounded-full bg-bg-elevated overflow-hidden">
           <motion.div className="h-full rounded-full" initial={{ width: 0 }}
             animate={{ width: `${goal.progress_percentage}%` }} transition={{ duration: 0.8, ease: "easeOut" }}
-            style={{ background: `linear-gradient(90deg, #B4522E, #8A7E6E)` }} />
+            style={{ background: `linear-gradient(90deg, #FFB000, #5A6470)` }} />
         </div>
       </div>
 
@@ -324,7 +324,7 @@ function CreateGoalModal({ open, onClose }) {
           {GOAL_CATS.map((c) => (
             <button key={c} onClick={() => setForm({ ...form, category: c })}
               className={`rounded-full px-3 py-1 text-[11px] font-semibold capitalize transition ${form.category === c ? "text-bg-base" : "bg-bg-elevated text-text-muted"}`}
-              style={form.category === c ? { background: COLORS[c] || "#8A7E6E" } : undefined}>{c}</button>
+              style={form.category === c ? { background: COLORS[c] || "#5A6470" } : undefined}>{c}</button>
           ))}
         </div>
 
@@ -373,7 +373,7 @@ export default function Habits() {
   const goalsQ = useQuery({ queryKey: ["goals", goalType], queryFn: () => fetchGoals({ goal_type: goalType, status: "active" }) });
 
   const summary = summaryQ.data;
-  const ringData = summary ? [{ name: "done", value: summary.completion_percentage, fill: "#B4522E" }] : [];
+  const ringData = summary ? [{ name: "done", value: summary.completion_percentage, fill: "#FFB000" }] : [];
 
   const topStreak = habitsQ.data?.reduce((best, h) => h.current_streak > (best?.current_streak || 0) ? h : best, null);
 

@@ -1,40 +1,41 @@
 @import "tailwindcss";
-@import url("https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
 
 /*
-  Producty — clean modern SaaS (backdoor-inspired).
-  Near-white airy canvas · white cards · soft hairlines · one terracotta accent.
-  A light white sidebar rail keeps the whole surface bright and minimal.
-  Plus Jakarta Sans carries the display voice; Geist sets text.
+  Producty — DEPARTURE BOARD.
+  A night-terminal system: deep slate-blue panels, hairline rules, amber/red
+  signaling, mechanical-grotesk signage headers and monospace data. Flat
+  rectangular panels stacked like a manifest — no floating cards, no chrome.
 
-    #F6F5F2  near-white — app canvas
-    #FFFFFF  cards / sidebar rail
-    #F0EEE9  inputs & hover tints
-    #B4522E  terracotta — the single accent (headings, actions, AI)
-    #1B1A17  near-black ink — primary text · #6E6A62 — muted text
-    #ECEAE5  soft hairline separators
-    #C2334D  cool crimson — functional danger only (not decorative)
+    #0E1217  night slate — base canvas
+    #141A21  panel surface · #1B232C  inset/hover
+    #0A0D11  rail (sidebar / darkest)
+    #2A2F36  hairline rule — the only divider
+    #FFB000  amber — primary signal (headings, actions, on-track)
+    #FF4D4D  red — urgent signal (overdue, danger)
+    #E7EAED  primary text · #8A929B  muted text
+  Archivo Black (signage) · IBM Plex Mono (data) · Inter (body).
 */
 
 :root {
-  --bg-base: #f6f5f2;
-  --bg-surface: #ffffff;
-  --bg-elevated: #f0eee9;
-  --bg-sidebar: #ffffff;
+  --bg-base: #0e1217;
+  --bg-surface: #141a21;
+  --bg-elevated: #1b232c;
+  --bg-sidebar: #0a0d11;
 
-  /* The single accent. Every legacy accent-* token funnels into terracotta so
-     the whole app reskins without touching class names; crimson stays danger. */
-  --accent: #b4522e;
-  --accent-blue: #b4522e;
-  --accent-purple: #b4522e;
-  --accent-amber: #b4522e;
-  --accent-green: #b4522e;
-  --accent-red: #c2334d;
+  /* Amber is the single primary signal; every legacy accent-* funnels into it.
+     Red is reserved strictly for urgent/danger states. */
+  --accent: #ffb000;
+  --accent-blue: #ffb000;
+  --accent-purple: #ffb000;
+  --accent-amber: #ffb000;
+  --accent-green: #ffb000;
+  --accent-red: #ff4d4d;
 
-  --text-primary: #1b1a17;
-  --text-muted: #6e6a62;
-  --text-onaccent: #ffffff; /* white text that sits on a terracotta fill */
-  --border: #eceae5;
+  --text-primary: #e7eaed;
+  --text-muted: #8a929b;
+  --text-onaccent: #0e1217; /* dark ink that sits on an amber fill */
+  --border: #2a2f36;
 }
 
 @theme inline {
@@ -55,9 +56,20 @@
   --color-text-onaccent: var(--text-onaccent);
   --color-border: var(--border);
 
-  --font-display: "Plus Jakarta Sans", "Geist", system-ui, sans-serif;
-  --font-body: "Geist", system-ui, -apple-system, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --font-display: "Archivo Black", "Archivo", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  /* Flat panels: collapse the radius scale to near-zero. Pills/avatars keep
+     --radius-full untouched so circular elements still render round. */
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 1px;
+  --radius-lg: 1px;
+  --radius-xl: 2px;
+  --radius-2xl: 2px;
+  --radius-3xl: 2px;
+  --radius-4xl: 2px;
 }
 
 html {
@@ -80,18 +92,24 @@ body {
   min-height: 100dvh;
 }
 
-/* Display face — modern geometric sans on headings/brand. */
+/* Display face — mechanical-grotesk signage. Uppercase, tight, like a board. */
 .font-display {
   font-family: var(--font-display);
-  letter-spacing: -0.012em;
-  font-feature-settings: "kern", "liga", "calt";
-  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.005em;
+  font-weight: 900;
 }
 
-/* Tighten large display headings for a crisp, modern-SaaS feel. */
 h1.font-display,
 h2.font-display {
-  letter-spacing: -0.028em;
+  letter-spacing: -0.005em;
+}
+
+/* Tabular monospace numerics — data, counts, timers always line up. */
+.font-mono,
+.tabular-nums {
+  font-feature-settings: "tnum";
+  font-variant-numeric: tabular-nums;
 }
 
 /* ---- Smooth scrolling (Lenis sets these; safe no-ops otherwise) ---- */
@@ -112,18 +130,18 @@ html.lenis body {
 /* ---- Thin, restrained scrollbars ---- */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d8d6cf transparent;
+  scrollbar-color: #2a2f36 transparent;
 }
 *::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 *::-webkit-scrollbar-thumb {
-  background: #dddbd3;
-  border-radius: 999px;
+  background: #2a2f36;
+  border-radius: 0;
 }
 *::-webkit-scrollbar-thumb:hover {
-  background: #c9c6bd;
+  background: #3a414a;
 }
 *::-webkit-scrollbar-track {
   background: transparent;
@@ -132,7 +150,7 @@ html.lenis body {
 /* ---- Selection ---- */
 ::selection {
   background: var(--accent);
-  color: var(--bg-base);
+  color: var(--text-onaccent);
 }
 
 /* Confetti keyframes (lowkey) */
@@ -167,9 +185,24 @@ html.lenis body {
   position: absolute;
   inset: 0;
   border-radius: 9999px;
-  /* soft terracotta halo */
-  background: radial-gradient(circle, rgba(180, 82, 46, 0.14) 0%, rgba(180, 82, 46, 0.05) 45%, transparent 70%);
+  /* amber signal halo */
+  background: radial-gradient(circle, rgba(255, 176, 0, 0.16) 0%, rgba(255, 176, 0, 0.05) 45%, transparent 70%);
   animation: cursor-glow-pulse 1.5s ease-out infinite;
+}
+
+/* ---- Split-flap "departure board" flip ----
+   The one flashy motion in the UI: a completed task row flips on its X axis
+   like a mechanical departure-board tile, then settles struck-through. */
+@keyframes split-flap {
+  0%   { transform: perspective(420px) rotateX(0deg);   opacity: 1; }
+  45%  { transform: perspective(420px) rotateX(-92deg);  opacity: 0.65; }
+  55%  { transform: perspective(420px) rotateX(-88deg);  opacity: 0.65; }
+  100% { transform: perspective(420px) rotateX(0deg);   opacity: 1; }
+}
+.split-flap {
+  transform-origin: center top;
+  animation: split-flap 460ms cubic-bezier(0.7, 0, 0.3, 1) both;
+  backface-visibility: hidden;
 }
 @keyframes cursor-glow-pulse {
   0%   { transform: scale(0.55); opacity: 0.85; }
@@ -212,8 +245,8 @@ html.lenis body {
 .note-editor .ProseMirror ul[data-type="taskList"] li { display: flex; gap: 0.6rem; align-items: flex-start; }
 .note-editor .ProseMirror ul[data-type="taskList"] li > label { margin-top: 0.28rem; }
 .note-editor .ProseMirror ul[data-type="taskList"] input[type="checkbox"] {
-  appearance: none; width: 16px; height: 16px; border-radius: 4px;
-  border: 1.5px solid #c2b6a1; cursor: pointer; position: relative; flex-shrink: 0;
+  appearance: none; width: 16px; height: 16px; border-radius: 0;
+  border: 1.5px solid #3a414a; cursor: pointer; position: relative; flex-shrink: 0;
 }
 .note-editor .ProseMirror ul[data-type="taskList"] input[type="checkbox"]:checked {
   background: var(--accent); border-color: var(--accent);
@@ -234,14 +267,14 @@ html.lenis body {
 .note-editor .ProseMirror a:hover { text-decoration: underline; }
 
 .note-editor .ProseMirror code {
-  background: #f0e7d8; padding: 0.12em 0.36em; border-radius: 4px;
-  font-family: var(--font-mono); font-size: 0.88em; color: #9c3f1f;
+  background: #1b232c; padding: 0.12em 0.36em; border-radius: 0;
+  font-family: var(--font-mono); font-size: 0.88em; color: #ffc04d;
 }
 .note-editor .ProseMirror pre {
-  background: #211d18; border: 1px solid #211d18; border-radius: 10px;
+  background: #0a0d11; border: 1px solid #2a2f36; border-radius: 0;
   padding: 0.9rem 1rem; font-family: var(--font-mono); font-size: 0.85rem; overflow-x: auto;
 }
-.note-editor .ProseMirror pre code { background: none; padding: 0; color: #ede6da; font-size: inherit; }
+.note-editor .ProseMirror pre code { background: none; padding: 0; color: #c9ccd1; font-size: inherit; }
 
 .note-editor .ProseMirror img { max-width: 100%; border-radius: 10px; }
 
@@ -250,9 +283,9 @@ html.lenis body {
   border: 1px solid var(--border); padding: 0.45rem 0.6rem; min-width: 3rem; vertical-align: top;
 }
 .note-editor .ProseMirror th { background: var(--bg-elevated); font-weight: 600; text-align: left; }
-.note-editor .ProseMirror tr:nth-child(even) td { background: rgba(33,29,24,0.025); }
+.note-editor .ProseMirror tr:nth-child(even) td { background: rgba(255,255,255,0.025); }
 .note-editor .ProseMirror .selectedCell:after {
-  content: ""; position: absolute; inset: 0; background: rgba(180, 82, 46, 0.12); pointer-events: none;
+  content: ""; position: absolute; inset: 0; background: rgba(255, 176, 0, 0.12); pointer-events: none;
 }
 .note-editor .ProseMirror .column-resize-handle { background: var(--accent); width: 3px; position: absolute; right: -1px; top: 0; bottom: 0; }
 

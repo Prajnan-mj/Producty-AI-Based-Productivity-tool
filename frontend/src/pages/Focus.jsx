@@ -69,7 +69,7 @@ export default function Focus() {
           <svg width="300" height="300" className="-rotate-90">
             <circle cx="150" cy="150" r={R} fill="none" stroke="var(--bg-elevated)" strokeWidth="10" />
             <circle cx="150" cy="150" r={R} fill="none"
-              stroke={mode === "work" ? "var(--accent)" : "#6F7D55"} strokeWidth="10" strokeLinecap="round"
+              stroke={mode === "work" ? "var(--accent)" : "#4D7C8A"} strokeWidth="10" strokeLinecap="round"
               strokeDasharray={C} strokeDashoffset={C * (1 - progress)}
               style={{ transition: "stroke-dashoffset 1s linear" }} />
           </svg>

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 
-const PASTELS = ["#B4522E", "#6F7D55", "#C08A3E", "#C2334D", "#8A7E6E"];
+const PASTELS = ["#FFB000", "#4D7C8A", "#B07A1E", "#FF4D4D", "#5A6470"];
 
 /**
  * Low-key confetti burst. Render conditionally; mounts → animates once → fades.
