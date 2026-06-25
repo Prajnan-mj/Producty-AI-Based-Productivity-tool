@@ -449,10 +449,4 @@ The UI follows a **dark minimalist** design language:
 
 ---
 
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
 Built by [Prajnan MJ](https://github.com/Prajnan-mj)
