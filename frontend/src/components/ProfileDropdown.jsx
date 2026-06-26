@@ -59,9 +59,17 @@ export default function ProfileDropdown() {
   const [open, setOpen] = useState(false);
   const [tab, setTab] = useState("main"); // "main" | "visibility"
   const [imgFailed, setImgFailed] = useState(false);
+  const [dark, setDark] = useState(() => document.documentElement.classList.contains("dark"));
   const { toggles, setToggle } = useSidebarToggles();
   const ref = useRef(null);
   const fileRef = useRef(null);
+
+  const toggleDark = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("theme", next ? "dark" : "light");
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -134,6 +142,21 @@ export default function ProfileDropdown() {
                     Edit profile picture
                   </button>
                   <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handlePfpUpload} />
+
+                  <button onClick={toggleDark}
+                    className="flex w-full items-center justify-between px-4 py-2 text-sm text-text-primary transition hover:bg-bg-elevated">
+                    <span className="flex items-center gap-3">
+                      {dark ? (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4 text-text-muted"><circle cx="12" cy="12" r="5" /><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} className="h-4 w-4 text-text-muted"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      )}
+                      {dark ? "Light mode" : "Dark mode"}
+                    </span>
+                    <span className={`flex h-5 w-9 items-center rounded-full px-0.5 transition ${dark ? "bg-accent" : "bg-border"}`}>
+                      <span className={`h-4 w-4 rounded-full bg-white shadow transition-transform ${dark ? "translate-x-4" : "translate-x-0"}`} />
+                    </span>
+                  </button>
 
                   <button onClick={() => setTab("visibility")}
                     className="flex w-full items-center gap-3 px-4 py-2 text-sm text-text-primary transition hover:bg-bg-elevated">

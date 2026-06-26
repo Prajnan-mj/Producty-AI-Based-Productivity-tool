@@ -332,37 +332,41 @@ export default function Dashboard() {
       <TopBar onSync={() => syncMut.mutate()} syncing={syncMut.isPending} />
 
       <main className="flex-1 px-4 py-6 lg:px-8">
-        <div className="mx-auto max-w-7xl grid grid-cols-1 lg:grid-cols-[30%_1fr_25%] gap-6">
-
-          {/* -------- LEFT COLUMN -------- */}
-          <div className="space-y-6">
-            <motion.div {...fadeUp}>
+        <div className="mx-auto max-w-6xl">
+          {/* Greeting bar */}
+          <motion.div {...fadeUp} className="mb-6 flex flex-wrap items-end justify-between gap-4">
+            <div>
               <p className="font-display text-2xl font-extrabold">{greeting()}, {firstName}</p>
               <p className="mt-1 text-sm text-text-muted">{today}</p>
-            </motion.div>
-
+            </div>
             <MoodCheckin />
-          </div>
+          </motion.div>
 
-          {/* -------- CENTER COLUMN -------- */}
-          <div className="space-y-4">
-            <h2 className="font-display text-lg font-bold">Urgency Feed</h2>
-            <UrgencyFeed
-              tasks={urgent.data}
-              summary={summary.data}
-              isLoading={urgent.isLoading || summary.isLoading}
-              onDone={(id) => doneMut.mutate(id)}
-              onSnooze={(id) => snoozeMut.mutate(id)}
-            />
-          </div>
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_38%]">
+            {/* -------- MAIN COLUMN -------- */}
+            <div className="space-y-5">
+              <AiTip message={plan.data?.motivational_message} />
 
-          {/* -------- RIGHT COLUMN -------- */}
-          <div className="space-y-6">
-            <MomentumWidget />
-            <HabitRing data={habits.data} isLoading={habits.isLoading} />
-            <MeetingsWidget data={meetings.data} isLoading={meetings.isLoading} />
-            <BillsWidget data={bills.data} isLoading={bills.isLoading} />
-            <AiTip message={plan.data?.motivational_message} />
+              <div>
+                <h2 className="mb-3 font-display text-lg font-bold">Urgency Feed</h2>
+                <UrgencyFeed
+                  tasks={urgent.data}
+                  summary={summary.data}
+                  isLoading={urgent.isLoading || summary.isLoading}
+                  onDone={(id) => doneMut.mutate(id)}
+                  onSnooze={(id) => snoozeMut.mutate(id)}
+                />
+              </div>
+
+              <MeetingsWidget data={meetings.data} isLoading={meetings.isLoading} />
+            </div>
+
+            {/* -------- SIDE COLUMN -------- */}
+            <div className="space-y-5">
+              <MomentumWidget />
+              <HabitRing data={habits.data} isLoading={habits.isLoading} />
+              <BillsWidget data={bills.data} isLoading={bills.isLoading} />
+            </div>
           </div>
         </div>
       </main>

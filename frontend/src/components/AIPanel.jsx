@@ -89,7 +89,7 @@ function DailyPlanTab() {
       {/* Motivation */}
       {data.motivational_message && (
         <div className="rounded-xl border border-accent-purple/20 bg-accent-purple/5 p-3">
-          <p className="text-sm italic leading-relaxed text-text-muted">✨ {data.motivational_message}</p>
+          <p className="text-sm italic leading-relaxed text-text-muted">{data.motivational_message}</p>
         </div>
       )}
     </div>
@@ -284,7 +284,7 @@ function EmailTab() {
       />
       <button onClick={handleCompose} disabled={!instruction.trim() || drafting}
         className="rounded-lg bg-accent-blue px-3 py-2 text-xs font-bold text-bg-base transition hover:bg-accent-blue/80 disabled:opacity-40">
-        {drafting ? "Drafting…" : "✨ Draft with AI"}
+        {drafting ? "Drafting…" : "Draft with AI"}
       </button>
 
       {draft && (
@@ -394,8 +394,7 @@ export default function AIPanel({ className = "" }) {
     <aside className={`flex w-80 flex-col border-l border-border bg-bg-surface ${className}`}>
       {/* Header + tabs */}
       <div className="border-b border-border px-4 pt-4">
-        <div className="mb-3 flex items-center gap-2">
-          <span className="flex h-6 w-6 items-center justify-center rounded-md bg-accent-purple/15 text-xs">✨</span>
+        <div className="mb-3">
           <h2 className="font-display text-sm font-bold">AI Assistant</h2>
         </div>
         <div className="flex gap-1">

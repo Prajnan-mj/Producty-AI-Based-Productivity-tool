@@ -33,8 +33,21 @@
 
   --text-primary: #1b1a17;
   --text-muted: #6e6a62;
-  --text-onaccent: #ffffff; /* white text that sits on a terracotta fill */
+  --text-onaccent: #ffffff;
   --border: #eceae5;
+}
+
+/* Dark mode — same terracotta accent, inverted surfaces. */
+html.dark {
+  --bg-base: #121212;
+  --bg-surface: #1a1a1a;
+  --bg-elevated: #242424;
+  --bg-sidebar: #141414;
+  --text-primary: #e8e6e1;
+  --text-muted: #8a8580;
+  --text-onaccent: #ffffff;
+  --border: #2a2a2a;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -124,6 +137,12 @@ html.lenis body {
 }
 *::-webkit-scrollbar-thumb:hover {
   background: #c9c6bd;
+}
+html.dark *::-webkit-scrollbar-thumb {
+  background: #3a3a3a;
+}
+html.dark *::-webkit-scrollbar-thumb:hover {
+  background: #4a4a4a;
 }
 *::-webkit-scrollbar-track {
   background: transparent;
