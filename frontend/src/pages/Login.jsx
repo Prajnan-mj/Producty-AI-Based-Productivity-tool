@@ -48,7 +48,7 @@ export default function Login() {
     <div className="grid min-h-dvh lg:grid-cols-2">
       {/* Left — full-bleed artwork (desktop only) */}
       <div className="relative hidden overflow-hidden lg:block">
-        <img src="/art-hero-banner.webp" alt="Producty — Working and Learning"
+        <img src="/art-knowledge-tree.webp" alt="Knowledge growing like a tree"
           className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
         <div className="relative flex h-full flex-col justify-between p-10">

@@ -78,6 +78,13 @@ export default function Landing() {
 
   if (token) return <Navigate to="/dashboard" replace />;
 
+  // Landing always renders in light mode regardless of the user's dark-mode toggle.
+  useEffect(() => {
+    const wasDark = document.documentElement.classList.contains("dark");
+    document.documentElement.classList.remove("dark");
+    return () => { if (wasDark) document.documentElement.classList.add("dark"); };
+  }, []);
+
   return (
     <div className="relative min-h-dvh bg-bg-base text-text-primary">
       <motion.div style={{ scaleX: progress }} className="fixed inset-x-0 top-0 z-50 h-0.5 origin-left bg-accent" />

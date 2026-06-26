@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useUserStore from "../store/userStore";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
+import toast from "react-hot-toast";
 import {
   fetchDailyPlan,
   fetchUrgentTasks,
@@ -10,6 +11,7 @@ import {
   fetchHabitsSummary,
   fetchMeetings,
   fetchUpcomingBills,
+  createBill,
   syncCalendar,
   markTaskDone,
   snoozeDeadline,
@@ -240,13 +242,82 @@ function MeetingsWidget({ data, isLoading }) {
 }
 
 function BillsWidget({ data, isLoading }) {
+  const qc = useQueryClient();
+  const [showAdd, setShowAdd] = useState(false);
+  const [form, setForm] = useState({ name: "", amount: "", reason: "personal", due_date: "" });
+  const addMut = useMutation({
+    mutationFn: (d) => createBill(d),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["upcomingBills"] });
+      setForm({ name: "", amount: "", reason: "personal", due_date: "" });
+      setShowAdd(false);
+      toast.success("Bill added");
+    },
+  });
+
+  const handleAdd = () => {
+    if (!form.name.trim() || !form.amount || !form.due_date) return;
+    addMut.mutate({
+      name: form.name.trim(),
+      amount: parseFloat(form.amount),
+      currency: "INR",
+      due_date: new Date(form.due_date).toISOString(),
+      category: "other",
+      recurrence: "one-time",
+      platform: "manual",
+      autopay_enabled: false,
+    });
+  };
+
   if (isLoading) return <CardSkeleton lines={2} />;
-  const bills = (data || []).slice(0, 2);
-  if (bills.length === 0) return null;
+  const bills = (data || []).slice(0, 3);
 
   return (
     <div className="rounded-xl border border-border bg-bg-surface p-5 space-y-3">
-      <h3 className="font-display text-sm font-bold text-text-muted uppercase tracking-wider">Bills Due</h3>
+      <div className="flex items-center justify-between">
+        <h3 className="text-xs font-semibold uppercase tracking-wider text-text-muted">Bills Due</h3>
+        <button onClick={() => setShowAdd(!showAdd)}
+          className="flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium text-accent transition hover:bg-accent/10">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="h-3 w-3"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          Add
+        </button>
+      </div>
+
+      <AnimatePresence>
+        {showAdd && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden">
+            <div className="space-y-2 rounded-lg border border-border bg-bg-elevated p-3">
+              <input placeholder="Bill name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
+                className="w-full rounded-lg border border-border bg-bg-surface px-2.5 py-1.5 text-sm text-text-primary placeholder:text-text-muted focus:border-accent focus:outline-none" />
+              <div className="flex gap-2">
+                <input type="number" placeholder="Amount" min="0" step="0.01" value={form.amount}
+                  onChange={(e) => setForm({ ...form, amount: e.target.value })}
+                  className="flex-1 rounded-lg border border-border bg-bg-surface px-2.5 py-1.5 text-sm font-mono text-text-primary placeholder:text-text-muted focus:outline-none" />
+                <input type="date" value={form.due_date} onChange={(e) => setForm({ ...form, due_date: e.target.value })}
+                  className="flex-1 rounded-lg border border-border bg-bg-surface px-2.5 py-1.5 text-xs text-text-primary focus:outline-none" />
+              </div>
+              <div className="flex items-center gap-2">
+                {["personal", "business"].map((r) => (
+                  <button key={r} onClick={() => setForm({ ...form, reason: r })}
+                    className={`rounded-md px-3 py-1 text-[11px] font-medium capitalize transition ${form.reason === r ? "bg-accent/15 text-accent" : "bg-bg-surface text-text-muted"}`}>
+                    {r}
+                  </button>
+                ))}
+                <button onClick={handleAdd} disabled={!form.name.trim() || !form.amount || !form.due_date || addMut.isPending}
+                  className="ml-auto rounded-md bg-accent px-3 py-1 text-[11px] font-semibold text-text-onaccent transition hover:opacity-90 disabled:opacity-50">
+                  {addMut.isPending ? "Adding..." : "Add bill"}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {bills.length === 0 && !showAdd && (
+        <p className="py-2 text-center text-sm text-text-muted">No upcoming bills.</p>
+      )}
+
       {bills.map((b) => (
         <div key={b.id} className="flex items-center justify-between">
           <div>
@@ -255,7 +326,7 @@ function BillsWidget({ data, isLoading }) {
               {b.days_until_due != null && b.days_until_due <= 1 ? "Due tomorrow" : `${b.days_until_due}d left`}
             </p>
           </div>
-          <span className="font-mono text-sm font-semibold text-accent-amber">
+          <span className="font-mono text-sm font-semibold text-accent">
             {b.currency === "INR" ? "₹" : "$"}{Number(b.amount).toLocaleString()}
           </span>
         </div>
@@ -336,7 +407,7 @@ export default function Dashboard() {
           {/* Greeting bar */}
           <motion.div {...fadeUp} className="mb-6 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="font-display text-2xl font-extrabold">{greeting()}, {firstName}</p>
+              <p className="text-2xl font-bold tracking-tight">{greeting()}, <span className="text-accent">{firstName}</span></p>
               <p className="mt-1 text-sm text-text-muted">{today}</p>
             </div>
             <MoodCheckin />
