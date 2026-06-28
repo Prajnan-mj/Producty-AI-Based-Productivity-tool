@@ -37,6 +37,38 @@ class User(Base):
         onupdate=func.now(),
         nullable=False,
     )
+    # Last successful sign-in. Updated on each OAuth callback.
+    last_login_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )
+
+
+class UserActivity(Base):
+    """One row per user per calendar day they were active.
+
+    Lets the admin dashboard answer "how many people used the app on day X"
+    without write-amplification — at most one insert per user per day.
+    """
+
+    __tablename__ = "user_activity"
+
+    id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    day: Mapped[date_type] = mapped_column(Date, nullable=False, index=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    __table_args__ = (
+        Index("uq_user_activity_user_day", "user_id", "day", unique=True),
+    )
 
 
 class Task(Base):

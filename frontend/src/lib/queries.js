@@ -184,6 +184,13 @@ export const fetchPendingReminders = () => api.get("/infra/reminders/pending").t
 export const fireReminder = (id) => api.post(`/infra/reminders/${id}/fire`).then((r) => r.data);
 export const pushToGoogleCalendar = (data) => api.post("/calendar/events", data).then((r) => r.data);
 
+// Admin analytics (admin-only — backend gates by email)
+export const fetchAdminOverview = () => api.get("/admin/stats/overview").then((r) => r.data);
+export const fetchAdminDaily = (days = 30) => api.get("/admin/stats/daily", { params: { days } }).then((r) => r.data);
+export const fetchAdminUsers = (limit = 50, offset = 0) =>
+  api.get("/admin/users", { params: { limit, offset } }).then((r) => r.data);
+export const fetchAdminWhoami = () => api.get("/admin/whoami").then((r) => r.data);
+
 // Flashcards (spaced repetition)
 export const fetchDecks = () => api.get("/flashcards/decks").then((r) => r.data);
 export const fetchCards = (deck, due = false) =>

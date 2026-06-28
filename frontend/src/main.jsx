@@ -27,6 +27,7 @@ import Rooms from "./pages/Rooms";
 import Flashcards from "./pages/Flashcards";
 import Rescue from "./pages/Rescue";
 import Capture from "./pages/Capture";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { refetchOnWindowFocus: false, retry: 1 } },
@@ -62,6 +63,7 @@ createRoot(document.getElementById("root")).render(
             {/* <Route path="/rooms" element={<Rooms />} /> */}
             <Route path="/rescue" element={<Rescue />} />
             <Route path="/capture" element={<Capture />} />
+            <Route path="/admin" element={<Admin />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" replace />} />

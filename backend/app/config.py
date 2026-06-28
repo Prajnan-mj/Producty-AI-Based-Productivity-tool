@@ -37,6 +37,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    # Comma-separated emails allowed to view the admin analytics dashboard.
+    # Defaults to the project owner; override via env in production.
+    ADMIN_EMAILS: str = "mj.prajnan@gmail.com"
+
     # LLM provider: "nvidia" (default), "gemini", or "mock"
     LLM_PROVIDER: str = "nvidia"
 
@@ -52,6 +56,11 @@ class Settings(BaseSettings):
     # DB connection pool bounds (avoid unbounded connections under load).
     DB_POOL_SIZE: int = 10
     DB_MAX_OVERFLOW: int = 20
+
+    @property
+    def admin_emails(self) -> set[str]:
+        """Lowercased set of admin emails for case-insensitive matching."""
+        return {e.strip().lower() for e in self.ADMIN_EMAILS.split(",") if e.strip()}
 
     @property
     def cors_origins(self) -> list[str]:

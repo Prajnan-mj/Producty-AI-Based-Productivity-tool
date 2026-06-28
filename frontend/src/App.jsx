@@ -12,6 +12,7 @@ import KeyboardHelp from "./components/KeyboardHelp";
 import PanicButton from "./components/PanicButton";
 import ProfileDropdown, { useSidebarToggles } from "./components/ProfileDropdown";
 import { LogoMark, Wordmark } from "./components/Logo";
+import { isAdmin } from "./lib/admin";
 import api from "./lib/api";
 
 function AiToggleButton() {
@@ -71,6 +72,8 @@ function SidebarIcon({ d }) {
 function Sidebar() {
   const { sidebarOpen, setSidebarOpen } = useUiStore();
   const { toggles } = useSidebarToggles();
+  const user = useUserStore((s) => s.user);
+  const userIsAdmin = isAdmin(user);
 
   return (
     <>
@@ -122,6 +125,21 @@ function Sidebar() {
 
         <div className="px-3 pb-4 pt-2">
           <div className="mx-3 mb-3 h-px bg-border" />
+
+          {userIsAdmin && (
+            <NavLink to="/admin" onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) =>
+                `mb-1 flex w-full items-center gap-3 rounded-lg py-2 pl-4 pr-3 text-[0.85rem] font-medium transition ${
+                  isActive ? "bg-accent/10 text-text-primary" : "text-text-muted hover:bg-bg-elevated hover:text-text-primary"
+                }`
+              }>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+                <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+              Admin
+            </NavLink>
+          )}
+
           <PanicButton compact />
 
           {/* Legal links */}

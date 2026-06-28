@@ -176,6 +176,7 @@ async def google_callback(
     result = await db.execute(select(User).where(User.email == email))
     user = result.scalar_one_or_none()
 
+    now_utc = datetime.now(timezone.utc)
     if user is None:
         user = User(
             email=email,
@@ -184,6 +185,7 @@ async def google_callback(
             google_access_token=credentials.token,
             google_refresh_token=credentials.refresh_token,
             google_token_expiry=token_expiry,
+            last_login_at=now_utc,
         )
         db.add(user)
     else:
@@ -193,6 +195,7 @@ async def google_callback(
         if credentials.refresh_token:
             user.google_refresh_token = credentials.refresh_token
         user.google_token_expiry = token_expiry
+        user.last_login_at = now_utc
 
     await db.flush()
     await db.refresh(user)

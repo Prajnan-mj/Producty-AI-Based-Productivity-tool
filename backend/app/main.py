@@ -32,6 +32,7 @@ from app.routers import (
     capture,
     infra,
     gmail,
+    admin,
 )
 
 
@@ -65,6 +66,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS recurrence_interval INTEGER NOT NULL DEFAULT 1",
             "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS parent_task_id UUID",
             "ALTER TABLE tasks ADD COLUMN IF NOT EXISTS tags TEXT",
+            "ALTER TABLE users ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ",
         ):
             await conn.execute(text(ddl))
     yield
@@ -141,6 +143,7 @@ app.include_router(triage.router, prefix="/api/triage", tags=["triage"])
 app.include_router(capture.router, prefix="/api/capture", tags=["capture"])
 app.include_router(infra.router, prefix="/api/infra", tags=["infra"])
 app.include_router(gmail.router, prefix="/api/gmail", tags=["gmail"])
+app.include_router(admin.router, prefix="/api/admin", tags=["admin"])
 
 
 @app.get("/health")
@@ -150,7 +153,12 @@ async def health_check() -> dict[str, str]:
 
 @app.get("/debug/config")
 async def debug_config() -> dict[str, object]:
-    """Temporary debug endpoint — shows masked config to diagnose deploy issues."""
+    """Masked config for diagnosing deploy issues. Disabled in production —
+    even masked values reveal infra topology, so never expose them when live."""
+    if not settings.DEBUG:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Not found")
+
     def mask(val: str) -> str:
         if not val:
             return "(empty)"
