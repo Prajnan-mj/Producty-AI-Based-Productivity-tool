@@ -15,4 +15,6 @@ USER appuser
 
 # No --reload in the image; production should set DEBUG=false.
 # Use multiple workers behind the platform's process manager as needed.
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Shell form so $PORT (injected by Railway/Render at runtime) is substituted;
+# falls back to 8000 when the platform doesn't set one.
+CMD uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
